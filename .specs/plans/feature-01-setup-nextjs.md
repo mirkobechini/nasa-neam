@@ -28,4 +28,6 @@ Nessuna — è il punto di partenza.
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata
+Completata il: 2026-07-03
+Note: Next.js 16.2.10 (non 14+), Prisma 7.8.0 con SQLite, Shadcn UI con tema anime spazio custom, next-intl IT/EN con routing. 7 test di validazione passati. Merge PR #2.
