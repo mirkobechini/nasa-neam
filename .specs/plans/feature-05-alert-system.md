@@ -26,4 +26,6 @@ Pannello alert con soglie personalizzabili (distanza, dimensione), notifiche toa
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata
+Completata il: 2026-07-03
+Note: AlertPanel (critical/warning), ThresholdControls (Slider), SoundToggle + useAlertNotifications (toast + Web Audio API). 27 test passati. Merge PR #10. Nota: Slider usa @base-ui/react (non Radix) in questa versione Shadcn.
