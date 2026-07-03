@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import type { AsteroidData } from "@/lib/types";
 
 interface Viewer2DProps {
@@ -9,9 +9,12 @@ interface Viewer2DProps {
 }
 
 export function Viewer2D({ data, onReady }: Viewer2DProps) {
+    const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [scale, setScale] = useState(1);
+    const scaleRef = useRef(1);
 
-    useEffect(() => {
+    const draw = useCallback(() => {
         if (!canvasRef.current || !data) return;
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
@@ -29,9 +32,15 @@ export function Viewer2D({ data, onReady }: Viewer2DProps) {
         ctx.fillStyle = "#050510";
         ctx.fillRect(0, 0, w, h);
 
+        const s = scaleRef.current;
         const cx = w / 2;
         const cy = h / 2;
         const maxR = Math.min(cx, cy) - 40;
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.scale(s, s);
+        ctx.translate(-cx, -cy);
 
         // Earth
         ctx.beginPath();
@@ -67,21 +76,15 @@ export function Viewer2D({ data, onReady }: Viewer2DProps) {
             const x = cx + Math.cos(angle) * r * 1.2;
             const y = cy + Math.sin(angle) * r * 0.6;
             const size = Math.max(3, a.sizeM / 80);
-            const isHazard = a.hazardous;
 
             ctx.beginPath();
             ctx.arc(x, y, size, 0, Math.PI * 2);
-            ctx.fillStyle = isHazard
-                ? "rgba(255,82,82,0.8)"
-                : "rgba(79,195,247,0.7)";
+            ctx.fillStyle = a.hazardous ? "rgba(255,82,82,0.8)" : "rgba(79,195,247,0.7)";
             ctx.fill();
-            ctx.strokeStyle = isHazard
-                ? "rgba(255,82,82,1)"
-                : "rgba(79,195,247,0.9)";
+            ctx.strokeStyle = a.hazardous ? "rgba(255,82,82,1)" : "rgba(79,195,247,0.9)";
             ctx.lineWidth = 1;
             ctx.stroke();
 
-            // Label for larger asteroids
             if (size > 5) {
                 ctx.fillStyle = "#9090b0";
                 ctx.font = "6px monospace";
@@ -90,7 +93,9 @@ export function Viewer2D({ data, onReady }: Viewer2DProps) {
             }
         });
 
-        // Legend
+        ctx.restore();
+
+        // Legend (always visible, not affected by zoom)
         ctx.fillStyle = "#9090b0";
         ctx.font = "7px monospace";
         ctx.textAlign = "left";
@@ -105,10 +110,33 @@ export function Viewer2D({ data, onReady }: Viewer2DProps) {
         onReady?.();
     }, [data, onReady]);
 
+    useEffect(() => {
+        draw();
+    }, [draw]);
+
+    // Wheel zoom
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        const handleWheel = (e: WheelEvent) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            const newScale = Math.min(5, Math.max(0.3, scaleRef.current * delta));
+            scaleRef.current = newScale;
+            setScale(newScale);
+        };
+
+        container.addEventListener("wheel", handleWheel, { passive: false });
+        return () => container.removeEventListener("wheel", handleWheel);
+    }, []);
+
     return (
-        <canvas
-            ref={canvasRef}
-            className="w-full h-[400px] rounded-lg"
-        />
+        <div ref={containerRef} className="w-full h-[400px] rounded-lg overflow-hidden bg-[#050510] relative">
+            <canvas ref={canvasRef} className="w-full h-full" />
+            <div className="absolute bottom-2 right-2 text-[0.55rem] font-mono text-muted-foreground bg-black/50 px-1.5 py-0.5 rounded">
+                {Math.round(scale * 100)}%
+            </div>
+        </div>
     );
 }
