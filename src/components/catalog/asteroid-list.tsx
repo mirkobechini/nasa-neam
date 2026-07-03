@@ -50,10 +50,8 @@ export function AsteroidList({
         const key = desc ? sortBy.slice(1) : sortBy;
 
         items.sort((a, b) => {
-            let va: string | number = a[key as keyof AsteroidData] ?? 0;
-            let vb: string | number = b[key as keyof AsteroidData] ?? 0;
-            if (typeof va === "string") va = va.toLowerCase();
-            if (typeof vb === "string") vb = vb.toLowerCase();
+            const va = String(a[key as keyof AsteroidData] ?? 0);
+            const vb = String(b[key as keyof AsteroidData] ?? 0);
             return desc ? (va < vb ? 1 : -1) : va < vb ? -1 : 1;
         });
 
@@ -116,7 +114,7 @@ export function AsteroidList({
                     </span>
                 </div>
                 <div className="flex gap-2 mt-2">
-                    <Select value={sortBy} onValueChange={setSortBy}>
+                    <Select value={sortBy} onValueChange={(v: string | null) => v && setSortBy(v)}>
                         <SelectTrigger className="w-[180px] h-8 text-xs">
                             <SelectValue />
                         </SelectTrigger>
@@ -130,7 +128,7 @@ export function AsteroidList({
                             <SelectItem value="name">Name A-Z</SelectItem>
                         </SelectContent>
                     </Select>
-                    <Select value={hazardFilter} onValueChange={setHazardFilter}>
+                    <Select value={hazardFilter} onValueChange={(v: string | null) => v && setHazardFilter(v)}>
                         <SelectTrigger className="w-[150px] h-8 text-xs">
                             <SelectValue />
                         </SelectTrigger>
@@ -166,8 +164,8 @@ export function AsteroidList({
                             >
                                 <span
                                     className={`w-2.5 h-2.5 rounded-full shrink-0 ${a.hazardous
-                                            ? "bg-destructive shadow-[0_0_8px_var(--destructive)]"
-                                            : "bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.5)]"
+                                        ? "bg-destructive shadow-[0_0_8px_var(--destructive)]"
+                                        : "bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.5)]"
                                         }`}
                                 />
                                 <div className="flex-1 min-w-0">
@@ -187,10 +185,10 @@ export function AsteroidList({
                                 </div>
                                 <div
                                     className={`w-12 h-12 rounded-full flex items-center justify-center font-heading text-[0.6rem] font-bold shrink-0 border-2 ${distClass === "close"
-                                            ? "border-orange-400 text-orange-400 bg-orange-400/10"
-                                            : distClass === "moderate"
-                                                ? "border-primary text-primary bg-primary/10"
-                                                : "border-green-400 text-green-400 bg-green-400/10"
+                                        ? "border-orange-400 text-orange-400 bg-orange-400/10"
+                                        : distClass === "moderate"
+                                            ? "border-primary text-primary bg-primary/10"
+                                            : "border-green-400 text-green-400 bg-green-400/10"
                                         }`}
                                 >
                                     {distLabel}
