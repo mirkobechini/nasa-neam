@@ -172,7 +172,7 @@ export function AsteroidList({
                                     <div className="text-sm font-semibold flex items-center gap-2">
                                         {a.name}
                                         {a.hazardous && (
-                                            <span className="text-[0.55rem] font-bold text-destructive tracking-wider">
+                                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[0.55rem] font-bold bg-destructive/20 text-[#ff5252] border border-destructive/40 tracking-wider">
                                                 ☠ HAZARD
                                             </span>
                                         )}
