@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 
 interface RateLimitData {
@@ -15,23 +15,30 @@ export function RateLimitBadge() {
     const [data, setData] = useState<RateLimitData | null>(null);
     const [error, setError] = useState(false);
 
-    const fetchRateLimit = useCallback(async () => {
-        try {
-            const res = await fetch("/api/neo/rate-limit");
-            if (!res.ok) throw new Error("API error");
-            const json = await res.json();
-            setData(json);
-            setError(false);
-        } catch {
-            setError(true);
-        }
-    }, []);
-
     useEffect(() => {
-        fetchRateLimit();
-        const interval = setInterval(fetchRateLimit, 60000);
-        return () => clearInterval(interval);
-    }, [fetchRateLimit]);
+        let cancelled = false;
+
+        async function fetchAndUpdate() {
+            try {
+                const res = await fetch("/api/neo/rate-limit");
+                if (!res.ok) throw new Error("API error");
+                const json = await res.json();
+                if (!cancelled) {
+                    setData(json);
+                    setError(false);
+                }
+            } catch {
+                if (!cancelled) setError(true);
+            }
+        }
+
+        fetchAndUpdate();
+        const interval = setInterval(fetchAndUpdate, 60000);
+        return () => {
+            cancelled = true;
+            clearInterval(interval);
+        };
+    }, []);
 
     if (error || !data) {
         return (
@@ -42,16 +49,16 @@ export function RateLimitBadge() {
     }
 
     const colorClass =
-        data.percentage > 50
+        data.percentage <= 20
             ? "text-green-400"
-            : data.percentage > 20
+            : data.percentage <= 50
                 ? "text-yellow-400"
                 : "text-destructive";
 
     const barColor =
-        data.percentage > 50
+        data.percentage <= 20
             ? "bg-green-400"
-            : data.percentage > 20
+            : data.percentage <= 50
                 ? "bg-yellow-400"
                 : "bg-destructive";
 

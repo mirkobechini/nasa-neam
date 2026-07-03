@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import "../globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { NavbarWrapper } from "@/components/layout/navbar-wrapper";
 
 const exo2 = Exo_2({
   variable: "--font-sans",
@@ -44,6 +45,7 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <NextIntlClientProvider messages={messages}>
+          <NavbarWrapper />
           {children}
         </NextIntlClientProvider>
         <Toaster />
