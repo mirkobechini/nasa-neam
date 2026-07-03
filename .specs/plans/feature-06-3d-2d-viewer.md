@@ -25,4 +25,6 @@ Visualizzazione orbite asteroidi con switch tra Three.js (3D) e Canvas 2D, con T
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata
+Completata il: 2026-07-03
+Note: Viewer3D (Three.js con Terra glow, anelli orbite, particelle asteroidi colorate per hazard), Viewer2D (Canvas orbite proiettate, legenda, etichette), pagina viewer con switch 3D/2D. 31 test passati. Merge PR #12.
