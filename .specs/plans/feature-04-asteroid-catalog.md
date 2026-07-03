@@ -25,4 +25,6 @@ Lista completa asteroidi con filtri, sorting, e pagina profilo dettaglio `/neo/{
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata
+Completata il: 2026-07-03
+Note: AsteroidList con filtri/sort, Catalog page, AsteroidProfile page /neo/[id]. 23 test passati. Merge PR #8.
