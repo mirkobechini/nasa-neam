@@ -179,10 +179,10 @@ export default function AsteroidProfile({
                             : " ✅ " + t("noRisk")}
                     </p>
                     <div className="flex gap-2 mt-3 flex-wrap">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.6rem] font-semibold bg-primary/10 text-primary border border-primary/20">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.6rem] font-semibold bg-primary/20 text-[#00e5ff] border border-primary/40">
                             NASA NeoWs
                         </span>
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.6rem] font-semibold bg-accent/10 text-accent border border-accent/20">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.6rem] font-semibold bg-accent/20 text-[#b388ff] border border-accent/40">
                             ID: {data.id}
                         </span>
                     </div>
