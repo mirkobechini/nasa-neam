@@ -49,6 +49,7 @@ Progetto personale (poi pubblico) per visualizzare asteroidi vicini alla Terra, 
 | **Toggle suoni** (non rimuoverli) | Rimozione completa dei suoni  | L'utente vuole poterli riattivare, non eliminarli                       |
 | **Proxy backend (API Routes)**    | Chiamata diretta dal frontend | Protegge API key NASA, gestisce caching server-side                     |
 | **Risorse NASA esterne**          | Contenuti scritti da noi      | Zero effort di mantenimento, dati sempre aggiornati                     |
+| **proxy.ts (Next.js 16)**         | middleware.ts (deprecato)     | Next.js 16 ha deprecato `middleware.ts` in favore di `proxy.ts`         |
 
 ## Vincoli
 
