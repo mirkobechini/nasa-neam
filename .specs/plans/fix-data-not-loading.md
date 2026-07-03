@@ -20,4 +20,6 @@ Risolvere il problema per cui i dati degli asteroidi non arrivano e la dashboard
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata
+Completata il: 2026-07-03
+Note: /api/neo/stats ora fetcha automaticamente da NASA NeoWs se la cache SQLite è vuota. Stessa logica di /api/neo/feed. PR #20.
