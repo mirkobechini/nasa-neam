@@ -34,8 +34,8 @@ export function ThresholdControls({
                     </span>
                 </div>
                 <Slider
-                    value={[distThreshold]}
-                    onValueChange={([v]) => onDistChange(v)}
+                    value={distThreshold}
+                    onValueChange={(v) => onDistChange(v as number)}
                     min={50000}
                     max={2000000}
                     step={10000}
@@ -53,8 +53,8 @@ export function ThresholdControls({
                     </span>
                 </div>
                 <Slider
-                    value={[sizeThreshold]}
-                    onValueChange={([v]) => onSizeChange(v)}
+                    value={sizeThreshold}
+                    onValueChange={(v) => onSizeChange(v as number)}
                     min={50}
                     max={1000}
                     step={10}
