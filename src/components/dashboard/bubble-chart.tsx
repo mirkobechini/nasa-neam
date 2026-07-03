@@ -117,15 +117,6 @@ export function BubbleChart({ data, loading, error }: BubbleChartProps) {
                                     borderRadius: "8px",
                                     fontSize: "12px",
                                 }}
-                                formatter={(value: number, name: string) => [
-                                    name === "Distance"
-                                        ? `${value}k km`
-                                        : `${value.toLocaleString()} km/h`,
-                                    name,
-                                ]}
-                                labelFormatter={(_label, payload) =>
-                                    payload[0]?.payload?.name || ""
-                                }
                             />
                             <Scatter data={chartData}>
                                 {chartData.map((entry, index) => (
