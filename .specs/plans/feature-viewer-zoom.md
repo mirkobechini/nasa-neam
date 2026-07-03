@@ -26,4 +26,6 @@ Aggiungere zoom con rotellina del mouse e pinch-to-zoom su mobile nei viewer 3D 
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata
+Completata il: 2026-07-03
+Note: OrbitControls (zoom, rotazione, pan) per 3D viewer. Wheel zoom con scala percentuale per 2D viewer. 40 test passati. PR #26.
