@@ -1,0 +1,97 @@
+{
+  "common": {
+    "appName": "N.E.A.M.",
+    "appSubtitle": "Near Earth Asteroid Monitor",
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "asteroids": "Asteroids",
+    "alerts": "Alerts",
+    "learn": "Learn",
+    "view3d": "3D View"
+  },
+  "hero": {
+    "badge": "REAL-TIME MONITORING ACTIVE",
+    "title": "Guardians of the Stars",
+    "subtitle": "Tracking near-Earth objects with real-time data from NASA's NeoWs. Stay informed, stay safe — explore the cosmos from your dashboard.",
+    "tracked": "Asteroids Tracked",
+    "hazardous": "Potentially Hazardous",
+    "avgSpeed": "Avg Speed (km/h)",
+    "closest": "Closest (km)"
+  },
+  "dashboard": {
+    "title": "Live Overview",
+    "subtitle": "Real-time asteroid telemetry",
+    "velocityVsDistance": "Velocity vs. Distance",
+    "hazardClassification": "Hazard Classification",
+    "sizeAsRadius": "SIZE → BUBBLE RADIUS",
+    "bySizeRange": "BY SIZE RANGE",
+    "noData": "No data available",
+    "waitingData": "Waiting for asteroid telemetry..."
+  },
+  "asteroids": {
+    "title": "Asteroid Catalog",
+    "filterSort": "Sort: Distance ↑",
+    "allObjects": "All Objects",
+    "hazardousOnly": "Hazardous Only",
+    "safeOnly": "Safe Only",
+    "noResults": "No asteroids found",
+    "noResultsHint": "Try adjusting your filters or check back later.",
+    "loadError": "Failed to load asteroid data.",
+    "objects": "objects"
+  },
+  "alerts": {
+    "title": "Alert System",
+    "active": "active",
+    "allClear": "All Clear",
+    "allClearHint": "No asteroids matching your alert thresholds.",
+    "customThresholds": "Custom Thresholds",
+    "maxDistance": "Max Distance (km)",
+    "minSize": "Min Size (m)",
+    "critical": "Critical",
+    "caution": "Caution",
+    "now": "NOW"
+  },
+  "visualization": {
+    "title": "3D/2D Viewer",
+    "subtitle": "Interactive orbital paths",
+    "initializing": "Initializing 3D scene...",
+    "unavailable": "3D Viewer Unavailable",
+    "unavailableHint": "WebGL may not be supported by your browser.",
+    "switch3d": "3D",
+    "switch2d": "2D"
+  },
+  "education": {
+    "title": "Educational Resources",
+    "subtitle": "Learn about asteroids & space safety",
+    "noResources": "No resources available"
+  },
+  "profile": {
+    "hazardous": "Potentially Hazardous",
+    "notHazardous": "Not Hazardous",
+    "minDistance": "Minimum Distance",
+    "estimatedSize": "Estimated Size",
+    "velocity": "Velocity",
+    "closeApproach": "Close Approach",
+    "orbitingBody": "Orbiting Body",
+    "trajectory": "Trajectory Path",
+    "trajectoryHint": "Orbital trajectory computed from NASA JPL data.",
+    "needsMonitoring": "This object requires close monitoring.",
+    "noRisk": "No immediate risk detected."
+  },
+  "rateLimit": {
+    "label": "API Calls",
+    "thisHour": "this hour"
+  },
+  "timeframe": {
+    "days3": "3 days",
+    "days7": "7 days",
+    "custom": "Custom"
+  }
+}

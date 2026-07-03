@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Asteroid {
+  id          String   @id
+  name        String
+  distKm      Float    @map("dist_km")
+  sizeM       Float    @map("size_m")
+  velocityKmh Float    @map("velocity_kmh")
+  hazardous   Boolean
+  closeApproach DateTime? @map("close_approach")
+  orbitBody   String   @default("Earth") @map("orbit_body")
+  rawJson     String   @map("raw_json")
+  fetchedAt   DateTime @default(now()) @map("fetched_at")
+
+  @@map("asteroids")
+}
+
+model ApiCallLog {
+  id        Int      @id @default(autoincrement())
+  endpoint  String
+  timestamp DateTime @default(now())
+  status    Int
+
+  @@map("api_call_logs")
+}
+
+model UserPreference {
+  id            Int     @id @default(autoincrement())
+  soundEnabled  Boolean @default(true) @map("sound_enabled")
+  distThreshold Float   @default(500000) @map("dist_threshold")
+  sizeThreshold Float   @default(200) @map("size_threshold")
+  language      String  @default("it")
+
+  @@map("user_preferences")
+}
