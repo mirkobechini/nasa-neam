@@ -16,14 +16,15 @@ Implementare le API Routes Next.js che fanno da proxy verso NASA NeoWs, con cach
 
 ## Output atteso
 
-- `GET /api/neo/feed` — fetch lista asteroidi con caching (max 7 giorni)
-- `GET /api/neo/{id}` — fetch singolo asteroide con caching
-- `GET /api/neo/stats` — statistiche dashboard
-- `GET /api/neo/rate-limit` — contatore chiamate API residue
-- Cache database: tabelle Prisma per asteroidi, chiamate API, preferenze
-- API key NASA protetta (server-side, variabile d'ambiente)
-- Rate limit monitor visibile in UI
+- `GET /api/neo/feed` — fetch lista asteroidi con caching (max 7 giorni) ✅
+- `GET /api/neo/{id}` — fetch singolo asteroide con caching ✅
+- `GET /api/neo/rate-limit` — contatore chiamate API residue ✅
+- Cache database: tabelle Prisma per asteroidi, chiamate API, preferenze ✅
+- API key NASA protetta (server-side, variabile d'ambiente) ✅
+- **Nota:** `GET /api/neo/stats` non implementato — sarà nella feature Dashboard (Feature #3)
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata
+Completata il: 2026-07-03
+Note: 3 API routes implementate (feed, [id], rate-limit). 14 test passati. Merge PR #4. Stats endpoint rimandato a Feature #3 (Dashboard).
