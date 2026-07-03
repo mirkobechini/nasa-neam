@@ -25,4 +25,6 @@ Pagina principale con panoramica live: statistiche eroe, grafici Recharts (bubbl
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata
+Completata il: 2026-07-03
+Note: 4 componenti UI (HeroStats, BubbleChart, HazardBarChart, TimeRangeFilter) + stats endpoint + pagina dashboard. 19 test passati. Merge PR #6. Fix Prisma 7.x adapter per SQLite (PrismaLibSql).
