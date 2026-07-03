@@ -14,4 +14,6 @@ Aggiungere `color: "#e8e8f0"` al `contentStyle` del Tooltip in `bubble-chart.tsx
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata
+Completata il: 2026-07-03
+Note: Aggiunto color: "#e8e8f0" al contentStyle del Tooltip in bubble-chart.tsx. PR #22.
