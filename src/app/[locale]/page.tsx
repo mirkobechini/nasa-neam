@@ -1,65 +1,104 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
+import { HeroStats } from "@/components/dashboard/hero-stats";
+import { BubbleChart } from "@/components/dashboard/bubble-chart";
+import { HazardBarChart } from "@/components/dashboard/hazard-bar-chart";
+import { TimeRangeFilter } from "@/components/dashboard/time-range-filter";
+import type { StatsData, TimeRange } from "@/lib/types";
+
+export default function DashboardPage() {
+  const t = useTranslations("dashboard");
+  const heroT = useTranslations("hero");
+
+  const [data, setData] = useState<StatsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [timeRange, setTimeRange] = useState<TimeRange>("7d");
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(false);
+
+    try {
+      const params = new URLSearchParams();
+      if (timeRange === "3d") {
+        const d = new Date();
+        d.setDate(d.getDate() - 3);
+        params.set("start_date", d.toISOString().split("T")[0]);
+      }
+
+      const url = `/api/neo/stats${params.toString() ? `?${params.toString()}` : ""}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("API error");
+      const json = await res.json();
+      setData(json);
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, [timeRange]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const asteroidData = data?.data ?? null;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="container max-w-7xl mx-auto px-4 md:px-6 py-8">
+      {/* Hero Section */}
+      <section className="text-center mb-12">
+        <div className="inline-flex items-center gap-2 bg-primary/10 border border-border rounded-full px-4 py-1.5 text-xs text-primary font-semibold tracking-wider mb-6">
+          <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.5)]" />
+          {heroT("badge")}
+        </div>
+
+        <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl font-black leading-tight mb-4 bg-gradient-to-r from-[var(--primary)] via-[var(--accent)] to-[var(--chart-3)] bg-clip-text text-transparent">
+          {heroT("title")}
+        </h1>
+
+        <p className="text-muted-foreground max-w-xl mx-auto text-base md:text-lg font-light">
+          {heroT("subtitle")}
+        </p>
+
+        <HeroStats
+          data={data}
+          loading={loading}
+          error={error}
+          onRetry={fetchData}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+      </section>
+
+      {/* Dashboard Section */}
+      <section>
+        <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
+          <div>
+            <h2 className="font-heading text-xl font-bold flex items-center gap-2">
+              <span className="text-primary">◆</span> {t("title")}
+            </h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {t("subtitle")}
+            </p>
+          </div>
+          <TimeRangeFilter value={timeRange} onChange={setTimeRange} />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <BubbleChart
+            data={asteroidData}
+            loading={loading}
+            error={error}
+          />
+          <HazardBarChart
+            data={asteroidData}
+            loading={loading}
+            error={error}
+          />
         </div>
-      </main>
+      </section>
     </div>
   );
 }
