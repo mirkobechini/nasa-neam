@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useCallback } from "react";
 import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import type { AsteroidData } from "@/lib/types";
 
 interface Viewer3DProps {
@@ -20,6 +21,7 @@ export function Viewer3D({ data, onReady, onError }: Viewer3DProps) {
         astroData: { angle: number; radius: number; yOff: number; speed: number }[];
         earth: THREE.Mesh;
         glow: THREE.Mesh;
+        controls: OrbitControls;
     } | null>(null);
     const animRef = useRef<number>(0);
 
@@ -135,6 +137,16 @@ export function Viewer3D({ data, onReady, onError }: Viewer3DProps) {
             camera.position.set(4, 3, 6);
             camera.lookAt(0, 0, 0);
 
+            // OrbitControls for zoom, rotate, pan
+            const controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 1.0;
+            controls.minDistance = 2;
+            controls.maxDistance = 20;
+            controls.target.set(0, 0, 0);
+
             sceneRef.current = {
                 scene,
                 camera,
@@ -143,6 +155,7 @@ export function Viewer3D({ data, onReady, onError }: Viewer3DProps) {
                 astroData,
                 earth,
                 glow,
+                controls,
             };
 
             onReady?.();
@@ -166,9 +179,7 @@ export function Viewer3D({ data, onReady, onError }: Viewer3DProps) {
                 });
                 particleSystem.geometry.attributes.position.needsUpdate = true;
 
-                camera.position.x = 5 * Math.cos(angle * 0.1);
-                camera.position.z = 5 * Math.sin(angle * 0.1);
-                camera.lookAt(0, 0, 0);
+                controls.update();
 
                 renderer.render(scene, camera);
             }
