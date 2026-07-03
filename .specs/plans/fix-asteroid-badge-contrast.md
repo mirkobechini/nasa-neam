@@ -10,4 +10,6 @@ Migliorare i colori dei badge nel profilo asteroide per renderli leggibili su sf
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata
+Completata il: 2026-07-03
+Note: Migliorati colori badge NASA NeoWs e ID nel profilo asteroide + badge HAZARD nella lista. PR #24.
