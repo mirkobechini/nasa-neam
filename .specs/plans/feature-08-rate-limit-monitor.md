@@ -22,4 +22,6 @@ Indicatore UI delle chiamate API NASA residue (1000 req/h), con alert visivo qua
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata
+Completata il: 2026-07-03
+Note: RateLimitBadge con progress bar e colori (verde/giallo/rosso), navbar con navigazione principale, integrato nel layout. 38 test passati. Merge PR #16.
