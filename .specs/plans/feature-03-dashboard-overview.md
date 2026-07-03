@@ -1,17 +1,21 @@
 # Feature: Dashboard Overview
 
 ## Obiettivo
+
 Pagina principale con panoramica live: statistiche eroe, grafici Recharts (bubble + bar), filtro temporale.
 
 ## Dipendenze
+
 - Feature 02 (Proxy Cache API)
 
 ## Stack
+
 - Next.js (Server Components + Client Components)
 - Recharts
 - Shadcn UI (Card, Skeleton)
 
 ## Output atteso
+
 - Hero stats: asteroidi tracciati, hazardous count, velocità media, distanza minima
 - Bubble chart: velocity vs distance (size = estimated size, color = hazard)
 - Bar chart: classification by size range
@@ -20,4 +24,5 @@ Pagina principale con panoramica live: statistiche eroe, grafici Recharts (bubbl
 - Test per i componenti principali
 
 ## Status
+
 [ ] Non iniziata
