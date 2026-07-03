@@ -116,6 +116,7 @@ export function BubbleChart({ data, loading, error }: BubbleChartProps) {
                                     border: "1px solid rgba(79,195,247,0.2)",
                                     borderRadius: "8px",
                                     fontSize: "12px",
+                                    color: "#e8e8f0",
                                 }}
                             />
                             <Scatter data={chartData}>
