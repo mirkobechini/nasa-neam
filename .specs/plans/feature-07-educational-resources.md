@@ -24,4 +24,6 @@ Nessuna (scheda standalone)
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata
+Completata il: 2026-07-03
+Note: EducationGrid con 9 card risorse NASA/JPL/ESA/CNSA, tag per livello, link esterni. Pagina education. 34 test passati. Merge PR #14.
