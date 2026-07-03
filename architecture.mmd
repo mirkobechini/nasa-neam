@@ -1,0 +1,46 @@
+graph TD
+    subgraph "Client Browser"
+        A[User] --> B[Next.js App<br/>React + Shadcn UI]
+        B --> C[Dashboard Page]
+        B --> D[Asteroid Catalog Page]
+        B --> E[Asteroid Profile Page<br/>/neo/{id}]
+        B --> F[Educational Page]
+        B --> G[3D/2D Viewer]
+        B --> H[Alert Panel]
+    end
+
+    subgraph "Next.js API Routes (Backend)"
+        I[/api/neo/feed<br/>Fetch asteroid list]
+        J[/api/neo/{id}<br/>Fetch single asteroid]
+        K[/api/neo/stats<br/>Dashboard statistics]
+        L[Cache Layer<br/>SQLite]
+    end
+
+    subgraph "External"
+        M[NASA NeoWs API<br/>api.nasa.gov]
+        N[NASA Educational<br/>Resources - external links]
+    end
+
+    subgraph "Services"
+        O[Vercel Hosting]
+        P[SQLite DB File<br/>cache.db]
+    end
+
+    B --> O
+    I --> L
+    J --> L
+    K --> L
+    I --> M
+    J --> M
+    L --> P
+    F --> N
+    E --> J
+    C --> K
+    C --> I
+    D --> I
+
+    style A fill:#4fc3f7,color:#000
+    style M fill:#ff5252,color:#fff
+    style N fill:#ffab40,color:#000
+    style O fill:#00e5ff,color:#000
+    style P fill:#b388ff,color:#fff
