@@ -1,0 +1,97 @@
+{
+  "common": {
+    "appName": "N.E.A.M.",
+    "appSubtitle": "Near Earth Asteroid Monitor",
+    "loading": "Caricamento...",
+    "error": "Errore",
+    "retry": "Riprova",
+    "close": "Chiudi",
+    "save": "Salva",
+    "cancel": "Annulla"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "asteroids": "Asteroidi",
+    "alerts": "Alert",
+    "learn": "Impara",
+    "view3d": "Vista 3D"
+  },
+  "hero": {
+    "badge": "MONITORAGGIO IN TEMPO REALE ATTIVO",
+    "title": "Guardiani delle Stelle",
+    "subtitle": "Tracciamento di oggetti near-Earth con dati in tempo reale da NASA NeoWs. Tieniti informato, al sicuro — esplora il cosmo dalla tua dashboard.",
+    "tracked": "Asteroidi Tracciati",
+    "hazardous": "Potenzialmente Pericolosi",
+    "avgSpeed": "Vel. Media (km/h)",
+    "closest": "Più Vicino (km)"
+  },
+  "dashboard": {
+    "title": "Panoramica Live",
+    "subtitle": "Telemetria asteroidi in tempo reale",
+    "velocityVsDistance": "Velocità vs. Distanza",
+    "hazardClassification": "Classificazione Pericolo",
+    "sizeAsRadius": "DIMENSIONE → RAGGIO BOLLA",
+    "bySizeRange": "PER FASCIA DIMENSIONE",
+    "noData": "Nessun dato disponibile",
+    "waitingData": "In attesa di telemetria..."
+  },
+  "asteroids": {
+    "title": "Catalogo Asteroidi",
+    "filterSort": "Ordina: Distanza ↑",
+    "allObjects": "Tutti gli oggetti",
+    "hazardousOnly": "Solo pericolosi",
+    "safeOnly": "Solo sicuri",
+    "noResults": "Nessun asteroide trovato",
+    "noResultsHint": "Prova a regolare i filtri o riprova più tardi.",
+    "loadError": "Impossibile caricare i dati degli asteroidi.",
+    "objects": "oggetti"
+  },
+  "alerts": {
+    "title": "Sistema di Allerta",
+    "active": "attivi",
+    "allClear": "Tutto Tranquillo",
+    "allClearHint": "Nessun asteroide corrisponde alle soglie impostate.",
+    "customThresholds": "Soglie Personalizzate",
+    "maxDistance": "Distanza Max (km)",
+    "minSize": "Dimensione Min (m)",
+    "critical": "Critico",
+    "caution": "Attenzione",
+    "now": "ORA"
+  },
+  "visualization": {
+    "title": "Visualizzatore 3D/2D",
+    "subtitle": "Percorsi orbitali interattivi",
+    "initializing": "Inizializzazione scena 3D...",
+    "unavailable": "Visore 3D Non Disponibile",
+    "unavailableHint": "WebGL potrebbe non essere supportato dal tuo browser.",
+    "switch3d": "3D",
+    "switch2d": "2D"
+  },
+  "education": {
+    "title": "Risorse Educative",
+    "subtitle": "Scopri gli asteroidi e la sicurezza spaziale",
+    "noResources": "Nessuna risorsa disponibile"
+  },
+  "profile": {
+    "hazardous": "Potenzialmente Pericoloso",
+    "notHazardous": "Non Pericoloso",
+    "minDistance": "Distanza Minima",
+    "estimatedSize": "Dimensione Stimata",
+    "velocity": "Velocità",
+    "closeApproach": "Avvicinamento",
+    "orbitingBody": "Corpo Orbitante",
+    "trajectory": "Percorso Orbitale",
+    "trajectoryHint": "Traiettoria orbitale calcolata dai dati NASA JPL.",
+    "needsMonitoring": "Richiede monitoraggio attento.",
+    "noRisk": "Nessun rischio immediato rilevato."
+  },
+  "rateLimit": {
+    "label": "Chiamate API",
+    "thisHour": "in questa ora"
+  },
+  "timeframe": {
+    "days3": "3 giorni",
+    "days7": "7 giorni",
+    "custom": "Personalizzato"
+  }
+}
