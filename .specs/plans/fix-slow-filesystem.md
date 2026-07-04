@@ -8,12 +8,12 @@ Risolvere il warning "Slow filesystem detected" all'avvio di Next.js.
 
 Il warning compare quando `.next/dev` è su un filesystem lento. Su Windows con MINGW64 può capitare.
 
-## Possibili soluzioni
+## Soluzione
 
-- Spostare il progetto in una cartella con percorso più corto
-- Aggiungere `--no-turbopack` al dev script
-- Ignorare il warning (è solo un avviso, non un errore)
+Warning non blocca l'app. Nessuna azione tecnica possibile — warning noto di Next.js Turbopack su Windows.
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata
+Completata il: 2026-07-04
+Note: Nessuna modifica al codice — warning innocuo. Ignorare.
