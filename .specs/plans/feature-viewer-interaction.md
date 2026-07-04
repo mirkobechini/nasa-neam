@@ -28,4 +28,6 @@ Aggiungere interattività ai viewer: hover su asteroide mostra mini legenda, cli
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata
+Completata il: 2026-07-04
+Note: AsteroidModal, raycaster 3D (hover + click), hit detection 2D (hover + click), tooltip nella viewer page. 44 test passati. PR #28.
