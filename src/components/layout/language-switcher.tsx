@@ -18,9 +18,9 @@ export function LanguageSwitcher() {
           <button
             key={l}
             onClick={() => router.replace(pathname, { locale: l })}
-            className={`px-2 py-1 text-[0.6rem] font-semibold rounded-md transition-colors ${isActive
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground"
+            className={`px-2 py-1 text-[0.6rem] font-semibold rounded-md transition-colors cursor-pointer ${isActive
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:text-foreground"
               }`}
           >
             {l.toUpperCase()}
