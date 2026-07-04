@@ -9,9 +9,11 @@ interface Viewer3DProps {
     data: AsteroidData[] | null;
     onReady?: () => void;
     onError?: () => void;
+    onHover?: (id: string | null) => void;
+    onClick?: (id: string) => void;
 }
 
-export function Viewer3D({ data, onReady, onError }: Viewer3DProps) {
+export function Viewer3D({ data, onReady, onError, onHover, onClick }: Viewer3DProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const sceneRef = useRef<{
         scene: THREE.Scene;
@@ -146,6 +148,58 @@ export function Viewer3D({ data, onReady, onError }: Viewer3DProps) {
             controls.minDistance = 2;
             controls.maxDistance = 20;
             controls.target.set(0, 0, 0);
+
+            // Raycaster for hover/click
+            const raycaster = new THREE.Raycaster();
+            const pointer = new THREE.Vector2();
+            let hoveredId: string | null = null;
+            const asteroidIds = (data || []).slice(0, 40).map((a) => a.id);
+
+            const onPointerMove = (event: MouseEvent) => {
+                const rect = renderer.domElement.getBoundingClientRect();
+                pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+                pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+                raycaster.setFromCamera(pointer, camera);
+                const intersects = raycaster.intersectObjects([particleSystem]);
+
+                if (intersects.length > 0) {
+                    const idx = intersects[0].index;
+                    if (idx !== undefined && idx < asteroidIds.length) {
+                        const id = asteroidIds[idx];
+                        if (id !== hoveredId) {
+                            hoveredId = id;
+                            onHover?.(id);
+                            renderer.domElement.style.cursor = "pointer";
+                        }
+                        return;
+                    }
+                }
+                if (hoveredId !== null) {
+                    hoveredId = null;
+                    onHover?.(null);
+                    renderer.domElement.style.cursor = "default";
+                }
+            };
+
+            const onClickRay = (event: MouseEvent) => {
+                const rect = renderer.domElement.getBoundingClientRect();
+                pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+                pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+                raycaster.setFromCamera(pointer, camera);
+                const intersects = raycaster.intersectObjects([particleSystem]);
+
+                if (intersects.length > 0) {
+                    const idx = intersects[0].index;
+                    if (idx !== undefined && idx < asteroidIds.length) {
+                        onClick?.(asteroidIds[idx]);
+                    }
+                }
+            };
+
+            renderer.domElement.addEventListener("pointermove", onPointerMove);
+            renderer.domElement.addEventListener("click", onClickRay);
 
             sceneRef.current = {
                 scene,
