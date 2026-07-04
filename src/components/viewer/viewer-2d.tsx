@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useEffect, useRef, useCallback, useState, useMemo } from "react";
 import type { AsteroidData } from "@/lib/types";
 
 interface Viewer2DProps {
@@ -13,12 +13,27 @@ interface Viewer2DProps {
 export function Viewer2D({ data, onReady, onHover, onClick }: Viewer2DProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [scale, setScale] = useState(1);
-    const scaleRef = useRef(1);
+    const [scale, setScale] = useState(2.2);
+    const scaleRef = useRef(2.2);
     const positionsRef = useRef<{ id: string; x: number; y: number; size: number }[]>([]);
     const panRef = useRef({ x: 0, y: 0 });
     const dragRef = useRef({ startX: 0, startY: 0, isDragging: false, moved: false });
-    const [pan, setPan] = useState({ x: 0, y: 0 });
+
+    const fixedPositions = useMemo(() => {
+        if (!data) return [];
+        const items = data.slice(0, 40);
+        const cx = 999, cy = 999, maxR = 400;
+        return items.map((a) => {
+            const angle = Math.random() * Math.PI * 2;
+            const r = maxR * (0.15 + Math.random() * 0.75);
+            return {
+                id: a.id, name: a.name, hazardous: a.hazardous,
+                x: cx + Math.cos(angle) * r * 1.2,
+                y: cy + Math.sin(angle) * r * 0.6,
+                size: Math.max(3, a.sizeM / 80),
+            };
+        });
+    }, [data]);
 
     const draw = useCallback(() => {
         if (!canvasRef.current || !data) return;
@@ -37,70 +52,49 @@ export function Viewer2D({ data, onReady, onHover, onClick }: Viewer2DProps) {
 
         const s = scaleRef.current;
         const p = panRef.current;
-        const cx = w / 2 + p.x;
-        const cy = h / 2 + p.y;
-        const maxR = Math.min(w, h) / 2 - 40;
+        const cx = w / 2;
+        const cy = h / 2;
 
         ctx.save();
-        ctx.translate(cx, cy);
+        ctx.translate(cx + p.x, cy + p.y);
         ctx.scale(s, s);
         ctx.translate(-cx, -cy);
 
-        // Earth
         ctx.beginPath();
-        ctx.arc(cx, cy, 16, 0, Math.PI * 2);
+        ctx.arc(w / 2, h / 2, 20, 0, Math.PI * 2);
         ctx.fillStyle = "#4fc3f7";
         ctx.fill();
         ctx.shadowColor = "#4fc3f7";
-        ctx.shadowBlur = 20;
+        ctx.shadowBlur = 30;
         ctx.fill();
         ctx.shadowBlur = 0;
         ctx.fillStyle = "#fff";
-        ctx.font = "bold 7px monospace";
+        ctx.font = "bold 10px monospace";
         ctx.textAlign = "center";
-        ctx.fillText("🌍", cx, cy + 2.5);
+        ctx.fillText("🌍", w / 2, h / 2 + 3);
 
-        // Orbit rings
-        const ringColors = ["#4fc3f7", "#b388ff", "#ff4081", "#69f0ae", "#ffab40"];
-        for (let i = 0; i < 5; i++) {
-            const r = maxR * (0.2 + i * 0.16);
-            ctx.beginPath();
-            ctx.ellipse(cx, cy, r * 1.2, r * 0.6, 0.3, 0, Math.PI * 2);
-            ctx.strokeStyle = ringColors[i] + "33";
-            ctx.lineWidth = 1;
-            ctx.stroke();
-        }
-
-        // Asteroids
-        const items = data.slice(0, 40);
         const pos: { id: string; x: number; y: number; size: number }[] = [];
-        items.forEach((a) => {
-            const angle = Math.random() * Math.PI * 2;
-            const r = maxR * (0.15 + Math.random() * 0.75);
-            const x = cx + Math.cos(angle) * r * 1.2;
-            const y = cy + Math.sin(angle) * r * 0.6;
-            const size = Math.max(3, a.sizeM / 80);
-            pos.push({ id: a.id, x, y, size });
-
+        fixedPositions.forEach((a) => {
+            const x = a.x - (999 - w / 2);
+            const y = a.y - (999 - h / 2);
+            pos.push({ id: a.id, x, y, size: a.size });
             ctx.beginPath();
-            ctx.arc(x, y, size, 0, Math.PI * 2);
+            ctx.arc(x, y, a.size, 0, Math.PI * 2);
             ctx.fillStyle = a.hazardous ? "rgba(255,82,82,0.8)" : "rgba(79,195,247,0.7)";
             ctx.fill();
             ctx.strokeStyle = a.hazardous ? "rgba(255,82,82,1)" : "rgba(79,195,247,0.9)";
             ctx.lineWidth = 1;
             ctx.stroke();
-
-            if (size > 4) {
+            if (a.size > 4) {
                 ctx.fillStyle = "#c0c0d0";
                 ctx.font = "8px monospace";
                 ctx.textAlign = "center";
-                ctx.fillText(a.name, x, y - size - 4);
+                ctx.fillText(a.name, x, y - a.size - 4);
             }
         });
         positionsRef.current = pos;
         ctx.restore();
 
-        // Legend
         ctx.save();
         ctx.shadowColor = "transparent";
         ctx.fillStyle = "#c0c0d0";
@@ -119,81 +113,85 @@ export function Viewer2D({ data, onReady, onHover, onClick }: Viewer2DProps) {
         ctx.fillText("Scroll to zoom · Drag to pan", 14, h - 6);
         ctx.restore();
         onReady?.();
-    }, [data, onReady]);
+    }, [data, fixedPositions, onReady]);
 
     useEffect(() => { draw(); }, [draw]);
 
-    // Wheel zoom
     useEffect(() => {
-        const container = containerRef.current;
-        if (!container) return;
-        const handleWheel = (e: WheelEvent) => {
+        const el = containerRef.current;
+        if (!el) return;
+        const hWheel = (e: WheelEvent) => {
             e.preventDefault();
-            const delta = e.deltaY > 0 ? 0.9 : 1.1;
-            scaleRef.current = Math.min(5, Math.max(0.3, scaleRef.current * delta));
+            scaleRef.current = Math.min(3, Math.max(0.3, scaleRef.current * (e.deltaY > 0 ? 0.9 : 1.1)));
             setScale(scaleRef.current);
             draw();
         };
-        container.addEventListener("wheel", handleWheel, { passive: false });
-        return () => container.removeEventListener("wheel", handleWheel);
+        el.addEventListener("wheel", hWheel, { passive: false });
+        return () => el.removeEventListener("wheel", hWheel);
     }, [draw]);
 
-    // Pan via drag + hover/click
     useEffect(() => {
-        const container = containerRef.current;
-        if (!container) return;
+        const el = containerRef.current;
+        if (!el) return;
 
-        const handleDown = (e: MouseEvent) => {
+        const hDown = (e: MouseEvent) => {
             dragRef.current = { startX: e.clientX, startY: e.clientY, isDragging: true, moved: false };
         };
-
-        const handleMove = (e: MouseEvent) => {
-            const drag = dragRef.current;
-            if (drag.isDragging) {
-                const dx = e.clientX - drag.startX;
-                const dy = e.clientY - drag.startY;
-                if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
-                    drag.moved = true;
+        const hMove = (e: MouseEvent) => {
+            const d = dragRef.current;
+            if (d.isDragging) {
+                const dx = e.clientX - d.startX;
+                const dy = e.clientY - d.startY;
+                if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+                    d.moved = true;
                     panRef.current.x += dx;
                     panRef.current.y += dy;
-                    drag.startX = e.clientX;
-                    drag.startY = e.clientY;
-                    setPan({ x: panRef.current.x, y: panRef.current.y });
+                    d.startX = e.clientX;
+                    d.startY = e.clientY;
                     draw();
                 }
                 return;
             }
-            // Hover
-            const rect = container.getBoundingClientRect();
+            const rect = el.getBoundingClientRect();
             const mx = e.clientX - rect.left;
             const my = e.clientY - rect.top;
-            const found = positionsRef.current.find((p) => Math.abs(mx - p.x) < p.size + 4 && Math.abs(my - p.y) < p.size + 4);
-            container.style.cursor = found ? "pointer" : "grab";
+            // Convert mouse coords to world coords (inverse of translate + scale)
+            const s = scaleRef.current;
+            const p = panRef.current;
+            const cxCanvas = el.clientWidth / 2;
+            const cyCanvas = el.clientHeight / 2;
+            const worldX = (mx - (cxCanvas + p.x) + cxCanvas * s) / s;
+            const worldY = (my - (cyCanvas + p.y) + cyCanvas * s) / s;
+            const found = positionsRef.current.find((pA) => Math.abs(worldX - pA.x) < pA.size + 4 && Math.abs(worldY - pA.y) < pA.size + 4);
+            el.style.cursor = found ? "pointer" : "grab";
             onHover?.(found?.id ?? null);
         };
-
-        const handleUp = (e: MouseEvent) => {
-            const drag = dragRef.current;
-            if (!drag.moved) {
-                // Click (not a drag)
-                const rect = container.getBoundingClientRect();
+        const hUp = (e: MouseEvent) => {
+            const d = dragRef.current;
+            if (!d.moved) {
+                const rect = el.getBoundingClientRect();
                 const mx = e.clientX - rect.left;
                 const my = e.clientY - rect.top;
-                const found = positionsRef.current.find((p) => Math.abs(mx - p.x) < p.size + 4 && Math.abs(my - p.y) < p.size + 4);
+                const s = scaleRef.current;
+                const p = panRef.current;
+                const cxCanvas = el.clientWidth / 2;
+                const cyCanvas = el.clientHeight / 2;
+                const worldX = (mx - (cxCanvas + p.x) + cxCanvas * s) / s;
+                const worldY = (my - (cyCanvas + p.y) + cyCanvas * s) / s;
+                const found = positionsRef.current.find((pA) => Math.abs(worldX - pA.x) < pA.size + 4 && Math.abs(worldY - pA.y) < pA.size + 4);
                 if (found) onClick?.(found.id);
             }
             dragRef.current = { startX: 0, startY: 0, isDragging: false, moved: false };
-            container.style.cursor = "grab";
+            el.style.cursor = "grab";
         };
-
-        container.addEventListener("mousedown", handleDown);
-        container.addEventListener("mousemove", handleMove);
-        container.addEventListener("mouseup", handleUp);
-        container.addEventListener("mouseleave", () => { dragRef.current.isDragging = false; container.style.cursor = "grab"; });
+        el.addEventListener("mousedown", hDown);
+        el.addEventListener("mousemove", hMove);
+        el.addEventListener("mouseup", hUp);
+        el.addEventListener("mouseleave", () => { dragRef.current.isDragging = false; el.style.cursor = "grab"; });
         return () => {
-            container.removeEventListener("mousedown", handleDown);
-            container.removeEventListener("mousemove", handleMove);
-            container.removeEventListener("mouseup", handleUp);
+            el.removeEventListener("mousedown", hDown);
+            el.removeEventListener("mousemove", hMove);
+            el.removeEventListener("mouseup", hUp);
         };
     }, [onHover, onClick, draw]);
 
