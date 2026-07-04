@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { RateLimitBadge } from "@/components/rate-limit/rate-limit-badge";
+import { LanguageSwitcher } from "@/components/layout/language-switcher";
 
 export function Navbar() {
     const t = useTranslations("nav");
@@ -30,8 +31,8 @@ export function Navbar() {
                             key={l.href}
                             href={l.href}
                             className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${pathname === l.href
-                                    ? "bg-primary/20 text-primary"
-                                    : "text-muted-foreground hover:text-foreground"
+                                ? "bg-primary/20 text-primary"
+                                : "text-muted-foreground hover:text-foreground"
                                 }`}
                         >
                             {l.icon} {l.label}
@@ -39,7 +40,10 @@ export function Navbar() {
                     ))}
                 </div>
 
-                <RateLimitBadge />
+                <div className="flex items-center gap-2">
+                    <RateLimitBadge />
+                    <LanguageSwitcher />
+                </div>
             </div>
         </nav>
     );
