@@ -21,4 +21,6 @@ Aggiungere un selettore di lingua nella navbar per passare da IT a EN.
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata
+Completata il: 2026-07-04
+Note: LanguageSwitcher nella navbar con bandierine IT/EN, route switching via next-intl. 47 test passati. PR #30.
