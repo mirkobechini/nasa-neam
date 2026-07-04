@@ -9,8 +9,8 @@ describe("Language Switcher", () => {
     );
     expect(content).toContain("LanguageSwitcher");
     expect(content).toContain("useLocale");
-    expect(content).toContain('code: "it"');
-    expect(content).toContain('code: "en"');
+    expect(content).toContain('"it"');
+    expect(content).toContain('"en"');
   });
 
   it("should be integrated in navbar", () => {

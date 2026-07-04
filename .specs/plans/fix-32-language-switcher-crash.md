@@ -14,4 +14,6 @@ Usare `useRouter` di next-intl (`useRouter().replace()`) per cambiare lingua sen
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata
+**Completata il:** 2026-07-04
+**Note:** Causa esatta era `locale` prop su `next/link` (non supportata). Fix via `createNavigation` + `useRouter.replace`. PR #34 → dev.
