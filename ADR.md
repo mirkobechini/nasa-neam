@@ -74,3 +74,10 @@ Progetto personale (poi pubblico) per visualizzare asteroidi vicini alla Terra, 
 - [ ] Confronto asteroidi side-by-side
 - [ ] Export CSV dati asteroidi
 - [ ] PWA (installabile come app) — da ultimo
+
+## Bug noti (da fixare)
+- [ ] Language switcher crash — URL invalido su cambio lingua
+- [ ] 2D viewer: legenda troppo piccola, drag a scatti
+- [ ] 3D viewer: click-drag conflict (click dopo drag apre modal)
+- [ ] 3D viewer: orbite ad anello troppo complesse
+- [ ] 3D viewer: aggiungere controllo velocità (slow/normal/fast)
