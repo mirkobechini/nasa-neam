@@ -76,6 +76,7 @@ Progetto personale (poi pubblico) per visualizzare asteroidi vicini alla Terra, 
 - [ ] PWA (installabile come app) — da ultimo
 
 ## Bug noti (da fixare)
+
 - [ ] Language switcher crash — URL invalido su cambio lingua
 - [ ] 2D viewer: legenda troppo piccola, drag a scatti
 - [ ] 3D viewer: click-drag conflict (click dopo drag apre modal)
