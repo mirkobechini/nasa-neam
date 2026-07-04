@@ -6,13 +6,16 @@ import type { AsteroidData } from "@/lib/types";
 interface Viewer2DProps {
     data: AsteroidData[] | null;
     onReady?: () => void;
+    onHover?: (id: string | null) => void;
+    onClick?: (id: string) => void;
 }
 
-export function Viewer2D({ data, onReady }: Viewer2DProps) {
+export function Viewer2D({ data, onReady, onHover, onClick }: Viewer2DProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [scale, setScale] = useState(1);
     const scaleRef = useRef(1);
+    const positionsRef = useRef<{ id: string; x: number; y: number; size: number }[]>([]);
 
     const draw = useCallback(() => {
         if (!canvasRef.current || !data) return;
@@ -28,7 +31,6 @@ export function Viewer2D({ data, onReady }: Viewer2DProps) {
 
         ctx.clearRect(0, 0, w, h);
 
-        // Background
         ctx.fillStyle = "#050510";
         ctx.fillRect(0, 0, w, h);
 
@@ -51,7 +53,6 @@ export function Viewer2D({ data, onReady }: Viewer2DProps) {
         ctx.shadowBlur = 20;
         ctx.fill();
         ctx.shadowBlur = 0;
-
         ctx.fillStyle = "#fff";
         ctx.font = "bold 7px monospace";
         ctx.textAlign = "center";
@@ -70,12 +71,14 @@ export function Viewer2D({ data, onReady }: Viewer2DProps) {
 
         // Asteroids
         const items = data.slice(0, 40);
+        const pos: { id: string; x: number; y: number; size: number }[] = [];
         items.forEach((a) => {
             const angle = Math.random() * Math.PI * 2;
             const r = maxR * (0.15 + Math.random() * 0.75);
             const x = cx + Math.cos(angle) * r * 1.2;
             const y = cy + Math.sin(angle) * r * 0.6;
             const size = Math.max(3, a.sizeM / 80);
+            pos.push({ id: a.id, x, y, size });
 
             ctx.beginPath();
             ctx.arc(x, y, size, 0, Math.PI * 2);
@@ -92,10 +95,11 @@ export function Viewer2D({ data, onReady }: Viewer2DProps) {
                 ctx.fillText(a.name, x, y - size - 3);
             }
         });
+        positionsRef.current = pos;
 
         ctx.restore();
 
-        // Legend (always visible, not affected by zoom)
+        // Legend
         ctx.fillStyle = "#9090b0";
         ctx.font = "7px monospace";
         ctx.textAlign = "left";
@@ -118,7 +122,6 @@ export function Viewer2D({ data, onReady }: Viewer2DProps) {
     useEffect(() => {
         const container = containerRef.current;
         if (!container) return;
-
         const handleWheel = (e: WheelEvent) => {
             e.preventDefault();
             const delta = e.deltaY > 0 ? 0.9 : 1.1;
@@ -126,10 +129,40 @@ export function Viewer2D({ data, onReady }: Viewer2DProps) {
             scaleRef.current = newScale;
             setScale(newScale);
         };
-
         container.addEventListener("wheel", handleWheel, { passive: false });
         return () => container.removeEventListener("wheel", handleWheel);
     }, []);
+
+    // Hover and click
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+        const handleMove = (e: MouseEvent) => {
+            const rect = container.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            const found = positionsRef.current.find(
+                (p) => Math.abs(mx - p.x) < p.size + 4 && Math.abs(my - p.y) < p.size + 4
+            );
+            container.style.cursor = found ? "pointer" : "default";
+            onHover?.(found?.id ?? null);
+        };
+        const handleClick = (e: MouseEvent) => {
+            const rect = container.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            const found = positionsRef.current.find(
+                (p) => Math.abs(mx - p.x) < p.size + 4 && Math.abs(my - p.y) < p.size + 4
+            );
+            if (found) onClick?.(found.id);
+        };
+        container.addEventListener("mousemove", handleMove);
+        container.addEventListener("click", handleClick);
+        return () => {
+            container.removeEventListener("mousemove", handleMove);
+            container.removeEventListener("click", handleClick);
+        };
+    }, [onHover, onClick]);
 
     return (
         <div ref={containerRef} className="w-full h-[400px] rounded-lg overflow-hidden bg-[#050510] relative">
