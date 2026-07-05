@@ -16,4 +16,10 @@ Rinominare `hWheel` a `handleWheel` nel `viewer-2d.tsx` per coerenza e per far p
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata — Risolto in PR #44
+
+## Note
+
+- Rinominata funzione `hWheel` → `handleWheel` in viewer-2d.tsx
+- Test `viewer-zoom.test.ts` ora passa
+- Merge effettuato 2026-07-05
