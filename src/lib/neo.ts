@@ -125,6 +125,102 @@ export function buildDateFilter(
   return filter;
 }
 
+export interface DateRange {
+  start: string;
+  end: string;
+}
+
+export function incrementDate(date: string) {
+  const d = new Date(date + "T00:00:00Z");
+  d.setDate(d.getDate() + 1);
+  return d.toISOString().split("T")[0];
+}
+
+export function splitInto7DayChunks(range: DateRange): DateRange[] {
+  const chunks: DateRange[] = [];
+  let current = range.start;
+
+  while (current <= range.end) {
+    const start = current;
+    const chunkEnd = new Date(current + "T00:00:00Z");
+    chunkEnd.setDate(chunkEnd.getDate() + 6);
+    const end =
+      chunkEnd.toISOString().split("T")[0] > range.end
+        ? range.end
+        : chunkEnd.toISOString().split("T")[0];
+
+    chunks.push({ start, end });
+    current = incrementDate(end);
+  }
+
+  return chunks;
+}
+
+export async function fetchRangeFromNasaAndCache(
+  range: DateRange,
+): Promise<boolean> {
+  const url = buildNasaUrl("/feed", {
+    start_date: range.start,
+    end_date: range.end,
+  });
+  const response = await fetch(url);
+  const apiData = await response.json();
+
+  await prisma.apiCallLog.create({
+    data: {
+      endpoint: `/feed ${range.start}..${range.end}`,
+      status: response.status,
+    },
+  });
+
+  if (!response.ok) return false;
+
+  const nearEarthObjects =
+    (apiData.near_earth_objects as Record<string, NeoObject[]>) || {};
+  const asteroids = Object.values(nearEarthObjects).flat();
+  const now = new Date();
+
+  for (const obj of asteroids) {
+    const parsed = parseAsteroidData(obj);
+    await upsertAsteroid(parsed, now);
+  }
+
+  return true;
+}
+
+export async function ensureRangeCached(range: DateRange) {
+  const cacheRange = await prisma.asteroid.aggregate({
+    _min: { closeApproach: true },
+    _max: { closeApproach: true },
+  });
+
+  const cachedStart = cacheRange._min.closeApproach
+    ? cacheRange._min.closeApproach.toISOString().split("T")[0]
+    : null;
+  const cachedEnd = cacheRange._max.closeApproach
+    ? cacheRange._max.closeApproach.toISOString().split("T")[0]
+    : null;
+
+  if (!cachedStart || !cachedEnd) {
+    const chunks = splitInto7DayChunks(range);
+    for (const chunk of chunks) {
+      const ok = await fetchRangeFromNasaAndCache(chunk);
+      if (!ok) return false;
+    }
+    return true;
+  }
+
+  const chunks = splitInto7DayChunks(range);
+  for (const chunk of chunks) {
+    if (chunk.end < cachedStart || chunk.start > cachedEnd) {
+      const ok = await fetchRangeFromNasaAndCache(chunk);
+      if (!ok) return false;
+    }
+  }
+
+  return true;
+}
+
 /**
  * Fetch the last 7 days of NEO data from NASA and cache it in the database.
  * Returns true if successful, false otherwise.
