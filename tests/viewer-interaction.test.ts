@@ -21,6 +21,9 @@ describe("Viewer interaction", () => {
     expect(content).toContain("pointermove");
     expect(content).toContain("onHover");
     expect(content).toContain("onClick");
+    expect(content).toContain("pointerdown");
+    expect(content).toContain("pointerup");
+    expect(content).toContain("hasDragged");
   });
 
   it("should have hover/click in 2D viewer", () => {
