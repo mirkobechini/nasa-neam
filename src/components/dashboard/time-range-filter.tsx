@@ -1,15 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useTimeRange } from "@/lib/contexts/TimeRangeContext";
 import type { TimeRange } from "@/lib/types";
-
-interface TimeRangeFilterProps {
-    value: TimeRange;
-    onChange: (range: TimeRange) => void;
-    customStart?: string;
-    customEnd?: string;
-    onCustomChange?: (start: string, end: string) => void;
-}
 
 const ranges: { key: TimeRange; labelKey: string }[] = [
     { key: "3d", labelKey: "timeframe.days3" },
@@ -17,14 +10,33 @@ const ranges: { key: TimeRange; labelKey: string }[] = [
     { key: "custom", labelKey: "timeframe.custom" },
 ];
 
-export function TimeRangeFilter({
-    value,
-    onChange,
-    customStart,
-    customEnd,
-    onCustomChange,
-}: TimeRangeFilterProps) {
+export function TimeRangeFilter() {
     const t = useTranslations();
+    const { dateMin, dateMax, setDateRange, setPredefinedRange } = useTimeRange();
+
+    // Determine current range type
+    const now = new Date();
+    const endStr = now.toISOString().split("T")[0];
+    let currentRange: TimeRange = "7d";
+
+    if (dateMin && dateMax) {
+        const minDate = new Date(dateMin);
+        const maxDate = new Date(dateMax);
+        const daysDiff = Math.round((maxDate.getTime() - minDate.getTime()) / (24 * 60 * 60 * 1000));
+
+        if (daysDiff <= 3) currentRange = "3d";
+        else if (daysDiff <= 7) currentRange = "7d";
+        else currentRange = "custom";
+    }
+
+    const handleRangeClick = (range: TimeRange) => {
+        if (range === "3d") {
+            setPredefinedRange("3days");
+        } else if (range === "7d") {
+            setPredefinedRange("7days");
+        }
+        // Custom range is handled by date inputs
+    };
 
     return (
         <div className="flex items-center gap-3 flex-wrap">
@@ -32,33 +44,29 @@ export function TimeRangeFilter({
                 {ranges.map((r) => (
                     <button
                         key={r.key}
-                        onClick={() => onChange(r.key)}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${value === r.key
-                                ? "bg-primary text-primary-foreground"
-                                : "text-muted-foreground hover:text-foreground"
+                        onClick={() => handleRangeClick(r.key)}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${currentRange === r.key
+                            ? "bg-primary text-primary-foreground"
+                            : "text-muted-foreground hover:text-foreground"
                             }`}
                     >
                         {t(r.labelKey)}
                     </button>
                 ))}
             </div>
-            {value === "custom" && onCustomChange && (
+            {currentRange === "custom" && (
                 <div className="flex items-center gap-2">
                     <input
                         type="date"
-                        value={customStart || ""}
-                        onChange={(e) =>
-                            onCustomChange(e.target.value, customEnd || "")
-                        }
+                        value={dateMin || ""}
+                        onChange={(e) => setDateRange(e.target.value, dateMax)}
                         className="bg-muted border border-border rounded-md px-2 py-1 text-xs text-foreground"
                     />
                     <span className="text-xs text-muted-foreground">→</span>
                     <input
                         type="date"
-                        value={customEnd || ""}
-                        onChange={(e) =>
-                            onCustomChange(customStart || "", e.target.value)
-                        }
+                        value={dateMax || ""}
+                        onChange={(e) => setDateRange(dateMin, e.target.value)}
                         className="bg-muted border border-border rounded-md px-2 py-1 text-xs text-foreground"
                     />
                 </div>

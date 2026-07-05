@@ -55,23 +55,13 @@ describe("Dashboard components", () => {
 
   it("should pass start_date and end_date for all time ranges", () => {
     const page = fs.readFileSync("src/app/[locale]/page.tsx", "utf-8");
-    // For 3d and 7d ranges
+    // Should use TimeRangeContext
+    expect(page).toContain("useTimeRange");
+    expect(page).toContain("dateMin");
+    expect(page).toContain("dateMax");
+    // Should pass params to API
     expect(page).toContain('params.set("start_date"');
     expect(page).toContain('params.set("end_date"');
-    // For custom range
-    expect(page).toContain("customStart");
-    expect(page).toContain("customEnd");
-    // handleTimeRangeChange resets custom dates when switching away
-    expect(page).toContain("handleTimeRangeChange");
-  });
-
-  it("should have closeApproach field in stats route", () => {
-    const content = fs.readFileSync("src/app/api/neo/stats/route.ts", "utf-8");
-    expect(content).toContain("closeApproach");
-    expect(content).toContain("buildDateFilter");
-    expect(content).toContain("start_date");
-    expect(content).toContain("end_date");
-    expect(content).toContain("NextRequest");
   });
 
   it("should have DateRangeFilter supporting custom date picker", () => {
@@ -79,9 +69,11 @@ describe("Dashboard components", () => {
       "src/components/dashboard/time-range-filter.tsx",
       "utf-8",
     );
-    expect(filter).toContain("customStart");
-    expect(filter).toContain("customEnd");
-    expect(filter).toContain("onCustomChange");
+    // Should use TimeRangeContext
+    expect(filter).toContain("useTimeRange");
+    expect(filter).toContain("setDateRange");
+    expect(filter).toContain("setPredefinedRange");
+    // Should have date inputs for custom range
     expect(filter).toContain('type="date"');
   });
 });

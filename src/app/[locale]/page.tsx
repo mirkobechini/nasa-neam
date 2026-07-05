@@ -6,18 +6,17 @@ import { HeroStats } from "@/components/dashboard/hero-stats";
 import { BubbleChart } from "@/components/dashboard/bubble-chart";
 import { HazardBarChart } from "@/components/dashboard/hazard-bar-chart";
 import { TimeRangeFilter } from "@/components/dashboard/time-range-filter";
-import type { StatsData, TimeRange } from "@/lib/types";
+import { useTimeRange } from "@/lib/contexts/TimeRangeContext";
+import type { StatsData } from "@/lib/types";
 
 export default function DashboardPage() {
   const t = useTranslations("dashboard");
   const heroT = useTranslations("hero");
+  const { dateMin, dateMax } = useTimeRange();
 
   const [data, setData] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [timeRange, setTimeRange] = useState<TimeRange>("7d");
-  const [customStart, setCustomStart] = useState("");
-  const [customEnd, setCustomEnd] = useState("");
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -25,29 +24,8 @@ export default function DashboardPage() {
 
     try {
       const params = new URLSearchParams();
-
-      if (timeRange === "custom" && customStart && customEnd) {
-        params.set("start_date", customStart);
-        params.set("end_date", customEnd);
-      } else {
-        const now = new Date();
-        const endDate = now.toISOString().split("T")[0];
-        let startDate: string;
-
-        if (timeRange === "3d") {
-          const d = new Date();
-          d.setDate(d.getDate() - 3);
-          startDate = d.toISOString().split("T")[0];
-        } else {
-          // Default 7d
-          const d = new Date();
-          d.setDate(d.getDate() - 7);
-          startDate = d.toISOString().split("T")[0];
-        }
-
-        params.set("start_date", startDate);
-        params.set("end_date", endDate);
-      }
+      params.set("start_date", dateMin);
+      params.set("end_date", dateMax);
 
       const url = `/api/neo/stats?${params.toString()}`;
       const res = await fetch(url);
@@ -59,20 +37,11 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [timeRange, customStart, customEnd]);
+  }, [dateMin, dateMax]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
-  const handleTimeRangeChange = (range: TimeRange) => {
-    setTimeRange(range);
-    // Reset custom dates when switching away from custom
-    if (range !== "custom") {
-      setCustomStart("");
-      setCustomEnd("");
-    }
-  };
 
   const asteroidData = data?.data ?? null;
 
@@ -89,7 +58,7 @@ export default function DashboardPage() {
           {heroT("title")}
         </h1>
 
-        <p className="text-muted-foreground max-w-xl mx-auto text-base md:text-lg font-light">
+        <p className="text-muted-foreground max-w-xl mx-auto text-base md:text/lg font-light">
           {heroT("subtitle")}
         </p>
 
@@ -112,16 +81,7 @@ export default function DashboardPage() {
               {t("subtitle")}
             </p>
           </div>
-          <TimeRangeFilter
-            value={timeRange}
-            onChange={handleTimeRangeChange}
-            customStart={customStart}
-            customEnd={customEnd}
-            onCustomChange={(start, end) => {
-              setCustomStart(start);
-              setCustomEnd(end);
-            }}
-          />
+          <TimeRangeFilter />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
