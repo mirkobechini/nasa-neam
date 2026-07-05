@@ -162,20 +162,21 @@ git push origin feature/<issue-number>-<short-description> --force-with-lease
 # Create Pull Request
 gh pr create --base dev --title "<type>(<scope>): <feature description>" --body "closes #<issue-number>"
 
-# Wait for CI to pass, then merge (preserves atomic commits)
-gh pr merge --merge --delete-branch
+# Wait for CI to pass, then merge locally with --no-ff to preserve branch history
+# IMPORTANT: Always use --no-ff to create a merge commit and preserve branch trace
+git checkout dev
+git pull origin dev
+git merge feature/<issue-number>-<short-description> --no-ff --no-edit
+git push origin dev
 
 # Verify issue auto-closed (GitHub sometimes misses the body reference)
 gh issue list --limit 5 | grep "#<issue-number>"
 # If still open, close manually:
 #   gh issue close <issue-number> --comment "Resolved by PR #<pr-number>."
 
-# Switch back to dev and sync
-git checkout dev
-git pull origin dev
-
-# Delete local branch (remote already deleted by --delete-branch)
+# Delete local and remote branches
 git branch -d feature/<issue-number>-<short-description>
+git push origin --delete feature/<issue-number>-<short-description>
 ```
 
 > ⚠️ Use `--merge` (not `--squash`) to preserve atomic commit history on `dev`. GitHub should auto-close the issue because the PR body contains `closes #N`. However, this occasionally fails. **Always verify** with `gh issue list` after merge. If still open, close manually with `gh issue close <number>`.
