@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { buildNasaUrl } from "@/lib/nasa";
 
@@ -47,6 +47,14 @@ async function fetchFromNasaAndCache() {
       : 0;
     const sizeM = obj.estimated_diameter?.meters?.estimated_diameter_max || 0;
 
+    // Parse close_approach_date into a Date object
+    let closeApproachDate: Date | null = null;
+    if (closeApproach?.close_approach_date) {
+      closeApproachDate = new Date(
+        closeApproach.close_approach_date + "T00:00:00Z",
+      );
+    }
+
     await prisma.asteroid.upsert({
       where: { id: obj.id },
       update: {
@@ -54,6 +62,7 @@ async function fetchFromNasaAndCache() {
         sizeM,
         velocityKmh,
         hazardous: obj.is_potentially_hazardous_asteroid || false,
+        closeApproach: closeApproachDate,
         rawJson: JSON.stringify(obj),
         fetchedAt: now,
       },
@@ -65,6 +74,7 @@ async function fetchFromNasaAndCache() {
         velocityKmh,
         hazardous: obj.is_potentially_hazardous_asteroid || false,
         orbitBody: closeApproach?.orbiting_body || "Earth",
+        closeApproach: closeApproachDate,
         rawJson: JSON.stringify(obj),
         fetchedAt: now,
       },
@@ -73,21 +83,55 @@ async function fetchFromNasaAndCache() {
   return true;
 }
 
-export async function GET() {
-  try {
-    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+function buildDateFilter(startDate?: string | null, endDate?: string | null) {
+  const filter: Record<string, Date> = {};
 
-    let asteroids = await prisma.asteroid.findMany({
+  if (startDate) {
+    filter.gte = new Date(startDate + "T00:00:00Z");
+  } else {
+    // Default: 7 days ago
+    const d = new Date();
+    d.setDate(d.getDate() - 7);
+    filter.gte = new Date(d.toISOString().split("T")[0] + "T00:00:00Z");
+  }
+
+  if (endDate) {
+    // Inclusive end: add one day so closeApproach < end+1
+    const end = new Date(endDate + "T00:00:00Z");
+    end.setDate(end.getDate() + 1);
+    filter.lt = end;
+  } else {
+    // Default: tomorrow (inclusive of today)
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    filter.lt = new Date(d.toISOString().split("T")[0] + "T00:00:00Z");
+  }
+
+  return filter;
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const startDate = searchParams.get("start_date");
+    const endDate = searchParams.get("end_date");
+
+    // Ensure cache is populated at least once
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    let cachedCount = await prisma.asteroid.count({
       where: { fetchedAt: { gte: sevenDaysAgo } },
     });
 
-    // Se cache vuota, fetcha da NASA
-    if (asteroids.length === 0) {
+    if (cachedCount === 0) {
       await fetchFromNasaAndCache();
-      asteroids = await prisma.asteroid.findMany({
-        where: { fetchedAt: { gte: sevenDaysAgo } },
-      });
     }
+
+    // Filter by close approach date range
+    const dateFilter = buildDateFilter(startDate, endDate);
+
+    let asteroids = await prisma.asteroid.findMany({
+      where: { closeApproach: dateFilter },
+    });
 
     if (asteroids.length === 0) {
       return NextResponse.json({

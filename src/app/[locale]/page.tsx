@@ -16,6 +16,8 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [timeRange, setTimeRange] = useState<TimeRange>("7d");
+  const [customStart, setCustomStart] = useState("");
+  const [customEnd, setCustomEnd] = useState("");
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -23,13 +25,31 @@ export default function DashboardPage() {
 
     try {
       const params = new URLSearchParams();
-      if (timeRange === "3d") {
-        const d = new Date();
-        d.setDate(d.getDate() - 3);
-        params.set("start_date", d.toISOString().split("T")[0]);
+
+      if (timeRange === "custom" && customStart && customEnd) {
+        params.set("start_date", customStart);
+        params.set("end_date", customEnd);
+      } else {
+        const now = new Date();
+        const endDate = now.toISOString().split("T")[0];
+        let startDate: string;
+
+        if (timeRange === "3d") {
+          const d = new Date();
+          d.setDate(d.getDate() - 3);
+          startDate = d.toISOString().split("T")[0];
+        } else {
+          // Default 7d
+          const d = new Date();
+          d.setDate(d.getDate() - 7);
+          startDate = d.toISOString().split("T")[0];
+        }
+
+        params.set("start_date", startDate);
+        params.set("end_date", endDate);
       }
 
-      const url = `/api/neo/stats${params.toString() ? `?${params.toString()}` : ""}`;
+      const url = `/api/neo/stats?${params.toString()}`;
       const res = await fetch(url);
       if (!res.ok) throw new Error("API error");
       const json = await res.json();
@@ -39,11 +59,20 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [timeRange]);
+  }, [timeRange, customStart, customEnd]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  const handleTimeRangeChange = (range: TimeRange) => {
+    setTimeRange(range);
+    // Reset custom dates when switching away from custom
+    if (range !== "custom") {
+      setCustomStart("");
+      setCustomEnd("");
+    }
+  };
 
   const asteroidData = data?.data ?? null;
 
@@ -83,7 +112,16 @@ export default function DashboardPage() {
               {t("subtitle")}
             </p>
           </div>
-          <TimeRangeFilter value={timeRange} onChange={setTimeRange} />
+          <TimeRangeFilter
+            value={timeRange}
+            onChange={handleTimeRangeChange}
+            customStart={customStart}
+            customEnd={customEnd}
+            onCustomChange={(start, end) => {
+              setCustomStart(start);
+              setCustomEnd(end);
+            }}
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
