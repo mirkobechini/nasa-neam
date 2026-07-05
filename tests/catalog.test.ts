@@ -42,6 +42,5 @@ describe("Asteroid Catalog", () => {
     const content = fs.readFileSync("src/app/api/neo/feed/route.ts", "utf-8");
     expect(content).toContain("export async function GET");
     expect(content).toContain("ensureRangeCached");
-    expect(content).toContain("buildNasaUrl");
   });
 });

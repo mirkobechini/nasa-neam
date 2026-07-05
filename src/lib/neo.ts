@@ -189,30 +189,19 @@ export async function fetchRangeFromNasaAndCache(
 }
 
 export async function ensureRangeCached(range: DateRange) {
-  const cacheRange = await prisma.asteroid.aggregate({
-    _min: { closeApproach: true },
-    _max: { closeApproach: true },
-  });
-
-  const cachedStart = cacheRange._min.closeApproach
-    ? cacheRange._min.closeApproach.toISOString().split("T")[0]
-    : null;
-  const cachedEnd = cacheRange._max.closeApproach
-    ? cacheRange._max.closeApproach.toISOString().split("T")[0]
-    : null;
-
-  if (!cachedStart || !cachedEnd) {
-    const chunks = splitInto7DayChunks(range);
-    for (const chunk of chunks) {
-      const ok = await fetchRangeFromNasaAndCache(chunk);
-      if (!ok) return false;
-    }
-    return true;
-  }
-
   const chunks = splitInto7DayChunks(range);
+
   for (const chunk of chunks) {
-    if (chunk.end < cachedStart || chunk.start > cachedEnd) {
+    const count = await prisma.asteroid.count({
+      where: {
+        closeApproach: {
+          gte: new Date(chunk.start + "T00:00:00Z"),
+          lt: new Date(incrementDate(chunk.end) + "T00:00:00Z"),
+        },
+      },
+    });
+
+    if (count === 0) {
       const ok = await fetchRangeFromNasaAndCache(chunk);
       if (!ok) return false;
     }
