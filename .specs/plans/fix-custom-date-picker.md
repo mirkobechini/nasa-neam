@@ -19,4 +19,10 @@ Il custom date range selector si è rotto — fix per ripristinare funzionalità
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata — PR #50 (2026-07-05)
+
+- isCustom state added to track custom picker visibility
+- Click handler for 'Custom' button
+- Date validation (start < end)
+- Error message display for invalid ranges
+- 1 new test added, 72 total tests passing
