@@ -3,8 +3,8 @@ import { Exo_2, Orbitron, Noto_Sans_JP } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import "../globals.css";
-import { Toaster } from "@/components/ui/sonner";
 import { NavbarWrapper } from "@/components/layout/navbar-wrapper";
+import { ClientProviders } from "@/components/layout/client-providers";
 
 const exo2 = Exo_2({
   variable: "--font-sans",
@@ -45,10 +45,11 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <NextIntlClientProvider messages={messages}>
-          <NavbarWrapper />
-          {children}
+          <ClientProviders>
+            <NavbarWrapper />
+            {children}
+          </ClientProviders>
         </NextIntlClientProvider>
-        <Toaster />
       </body>
     </html>
   );
