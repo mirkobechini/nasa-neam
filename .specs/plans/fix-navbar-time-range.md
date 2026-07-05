@@ -19,4 +19,9 @@ Spostare la barra "3 days / 7 days / Custom" dalla home (due posizioni) alla nav
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata — PR #51 (2026-07-05)
+
+- Integrato TimeRangeFilter nella navbar
+- Rimosso dalle duplicates nella home
+- Semplificato NavbarWrapper
+- 2 test aggiornati, 72 totali test passing
