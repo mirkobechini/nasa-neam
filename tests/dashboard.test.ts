@@ -76,4 +76,29 @@ describe("Dashboard components", () => {
     // Should have date inputs for custom range
     expect(filter).toContain('type="date"');
   });
+
+  it("should show loading text indicator in HeroStats", () => {
+    const content = fs.readFileSync(
+      "src/components/dashboard/hero-stats.tsx",
+      "utf-8",
+    );
+    expect(content).toContain("Loading asteroid data...");
+    expect(content).toContain("animate-pulse");
+  });
+
+  it("should show loading text in BubbleChart", () => {
+    const content = fs.readFileSync(
+      "src/components/dashboard/bubble-chart.tsx",
+      "utf-8",
+    );
+    expect(content).toContain("Loading chart data...");
+  });
+
+  it("should show loading text in HazardBarChart", () => {
+    const content = fs.readFileSync(
+      "src/components/dashboard/hazard-bar-chart.tsx",
+      "utf-8",
+    );
+    expect(content).toContain("Loading chart data...");
+  });
 });
