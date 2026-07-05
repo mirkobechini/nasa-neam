@@ -11,4 +11,6 @@ Migliorare il viewer 2D: legenda più grande, drag fluido senza scatti.
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata
+Completata il: 2026-07-05
+Note: Legenda 11px bold, drag-to-pan, coordinate world-to-screen per hit, posizioni fisse, zoom 220%. PR #36.
