@@ -21,4 +21,15 @@ Risolvere il problema per cui selezionando un range custom (es. Marzo - Maggio) 
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata
+
+## Completed
+
+2026-07-05
+
+## Note
+
+- Implementato chunking 7 giorni per range estesi e verifica cache in `src/lib/neo.ts`.
+- Aggiornate le route `src/app/api/neo/feed/route.ts` e `src/app/api/neo/stats/route.ts` per utilizzare `ensureRangeCached`.
+- Verificati i test legati all'issue: `tests/api.test.ts`, `tests/catalog.test.ts`, `tests/dashboard.test.ts`, `tests/neo.test.ts`.
+- La chiusura issue segue il processo di validazione test e aggiornamento documenti.
