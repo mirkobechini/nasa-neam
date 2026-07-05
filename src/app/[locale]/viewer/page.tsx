@@ -6,10 +6,12 @@ import { Viewer3D } from "@/components/viewer/viewer-3d";
 import { Viewer2D } from "@/components/viewer/viewer-2d";
 import { SpeedControls } from "@/components/viewer/speed-controls";
 import { AsteroidModal } from "@/components/viewer/asteroid-modal";
+import { useTimeRange } from "@/lib/contexts/TimeRangeContext";
 import type { AsteroidData } from "@/lib/types";
 
 export default function ViewerPage() {
   const t = useTranslations("visualization");
+  const { dateMin, dateMax } = useTimeRange();
   const [mode, setMode] = useState<"3d" | "2d">("3d");
   const [speed, setSpeed] = useState<number>(1);
   const [data, setData] = useState<AsteroidData[] | null>(null);
@@ -24,7 +26,10 @@ export default function ViewerPage() {
     setLoading(true);
     setError(false);
     try {
-      const res = await fetch("/api/neo/feed");
+      const params = new URLSearchParams();
+      params.set("start_date", dateMin);
+      params.set("end_date", dateMax);
+      const res = await fetch(`/api/neo/feed?${params.toString()}`);
       if (!res.ok) throw new Error("API error");
       const json = await res.json();
       setData(json.data || []);
@@ -33,7 +38,7 @@ export default function ViewerPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [dateMin, dateMax]);
 
   useEffect(() => {
     fetchData();
