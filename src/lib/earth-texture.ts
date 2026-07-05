@@ -309,3 +309,219 @@ export function createAsteroidMesh(
 
   return mesh;
 }
+
+/**
+ * Creates a 2D anime-style Earth canvas for 2D viewer.
+ * Returns a canvas element with gradient oceans and anime continents.
+ */
+export function createEarth2DAnime(size: number = 400): HTMLCanvasElement {
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Unable to get 2D context");
+
+  // Create gradient background (ocean) - anime blues
+  const gradient = ctx.createRadialGradient(
+    size / 2,
+    size / 2,
+    0,
+    size / 2,
+    size / 2,
+    size / 2,
+  );
+  gradient.addColorStop(0, "#1e88e5");
+  gradient.addColorStop(0.6, "#1565c0");
+  gradient.addColorStop(1, "#0d47a1");
+
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+
+  // Anime-style continents with varied colors
+  ctx.globalAlpha = 0.85;
+
+  // North America - green
+  ctx.fillStyle = "#2e7d32";
+  ctx.beginPath();
+  ctx.ellipse(
+    size * 0.23,
+    size * 0.32,
+    size * 0.075,
+    size * 0.095,
+    -0.3,
+    0,
+    Math.PI * 2,
+  );
+  ctx.fill();
+
+  // South America
+  ctx.fillStyle = "#33691e";
+  ctx.beginPath();
+  ctx.ellipse(
+    size * 0.3,
+    size * 0.62,
+    size * 0.048,
+    size * 0.078,
+    -0.2,
+    0,
+    Math.PI * 2,
+  );
+  ctx.fill();
+
+  // Europe
+  ctx.fillStyle = "#558b2f";
+  ctx.beginPath();
+  ctx.ellipse(
+    size * 0.48,
+    size * 0.28,
+    size * 0.04,
+    size * 0.05,
+    0.1,
+    0,
+    Math.PI * 2,
+  );
+  ctx.fill();
+
+  // Africa - orange-brown
+  ctx.fillStyle = "#d84315";
+  ctx.beginPath();
+  ctx.ellipse(
+    size * 0.52,
+    size * 0.48,
+    size * 0.065,
+    size * 0.12,
+    0,
+    0,
+    Math.PI * 2,
+  );
+  ctx.fill();
+
+  // Asia - green
+  ctx.fillStyle = "#2e7d32";
+  ctx.beginPath();
+  ctx.ellipse(
+    size * 0.64,
+    size * 0.3,
+    size * 0.11,
+    size * 0.095,
+    0.2,
+    0,
+    Math.PI * 2,
+  );
+  ctx.fill();
+
+  // Australia
+  ctx.fillStyle = "#bf360c";
+  ctx.beginPath();
+  ctx.ellipse(
+    size * 0.73,
+    size * 0.64,
+    size * 0.048,
+    size * 0.058,
+    0,
+    0,
+    Math.PI * 2,
+  );
+  ctx.fill();
+
+  // Glow effect
+  ctx.globalAlpha = 0.15;
+  ctx.fillStyle = "#81d4fa";
+  for (let i = 0; i < 3; i++) {
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, (size / 2) * (1 - i * 0.15), 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  return canvas;
+}
+
+/**
+ * Creates a 2D anime-style asteroid sprite with proportional sizing.
+ * Sprite size is based on sizeM with logarithmic scaling.
+ */
+export function createAsteroid2DSprite2D(
+  name: string,
+  sizeM: number,
+  isHazardous: boolean,
+): HTMLCanvasElement {
+  // Canvas size based on sizeM (logarithmic scaling)
+  const minCanvasSize = 40;
+  const maxCanvasSize = 120;
+  const logSize = Math.log10(Math.max(sizeM, 1));
+  const canvasSize =
+    minCanvasSize + (logSize / 3) * (maxCanvasSize - minCanvasSize);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = canvasSize;
+  canvas.height = canvasSize;
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Unable to get 2D context");
+
+  // Draw anime-style rocky asteroid with random jaggedness
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height / 2;
+  const baseRadius = Math.min(canvas.width, canvas.height) * 0.35;
+
+  // Draw rocky asteroid with jagged edges
+  ctx.fillStyle = "#8b8680";
+  ctx.beginPath();
+
+  const points = 12;
+  for (let i = 0; i < points; i++) {
+    const angle = (i / points) * Math.PI * 2;
+    const jaggedRadius = baseRadius * (0.8 + Math.random() * 0.4);
+    const x = centerX + Math.cos(angle) * jaggedRadius;
+    const y = centerY + Math.sin(angle) * jaggedRadius;
+
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.fill();
+
+  // Add shading for rocky effect
+  ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+  ctx.beginPath();
+  ctx.ellipse(
+    centerX + baseRadius * 0.2,
+    centerY + baseRadius * 0.2,
+    baseRadius * 0.4,
+    baseRadius * 0.3,
+    0.3,
+    0,
+    Math.PI * 2,
+  );
+  ctx.fill();
+
+  // Contorno per pericolo
+  const borderColor = isHazardous ? "#ef4444" : "#4fc3f7";
+  const borderWidth = canvasSize > 60 ? 3 : 2;
+  ctx.strokeStyle = borderColor;
+  ctx.lineWidth = borderWidth;
+  ctx.beginPath();
+
+  for (let i = 0; i < points; i++) {
+    const angle = (i / points) * Math.PI * 2;
+    const jaggedRadius = baseRadius * (0.8 + Math.random() * 0.4);
+    const x = centerX + Math.cos(angle) * jaggedRadius;
+    const y = centerY + Math.sin(angle) * jaggedRadius;
+
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.stroke();
+
+  // Label if space
+  if (canvasSize > 50) {
+    ctx.font = `bold ${Math.max(8, canvasSize * 0.2)}px Arial`;
+    ctx.fillStyle = "#4fc3f7";
+    ctx.textAlign = "center";
+    ctx.fillText(name.substring(0, 4), centerX, centerY + baseRadius * 1.2);
+  }
+
+  return canvas;
+}
