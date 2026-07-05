@@ -153,9 +153,22 @@ export function Viewer3D({ data, onReady, onError, onHover, onClick }: Viewer3DP
             const raycaster = new THREE.Raycaster();
             const pointer = new THREE.Vector2();
             let hoveredId: string | null = null;
+            let pointerDown = false;
+            let hasDragged = false;
+            const dragThreshold = 5;
+            const dragThresholdSq = dragThreshold * dragThreshold;
+            const pointerDownPos = { x: 0, y: 0 };
             const asteroidIds = (data || []).slice(0, 40).map((a) => a.id);
 
             const onPointerMove = (event: MouseEvent) => {
+                if (pointerDown && !hasDragged) {
+                    const dx = event.clientX - pointerDownPos.x;
+                    const dy = event.clientY - pointerDownPos.y;
+                    if (dx * dx + dy * dy > dragThresholdSq) {
+                        hasDragged = true;
+                    }
+                }
+
                 const rect = renderer.domElement.getBoundingClientRect();
                 pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
                 pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -182,7 +195,23 @@ export function Viewer3D({ data, onReady, onError, onHover, onClick }: Viewer3DP
                 }
             };
 
+            const onPointerDown = (event: MouseEvent) => {
+                pointerDown = true;
+                hasDragged = false;
+                pointerDownPos.x = event.clientX;
+                pointerDownPos.y = event.clientY;
+            };
+
+            const onPointerUp = () => {
+                pointerDown = false;
+            };
+
             const onClickRay = (event: MouseEvent) => {
+                if (hasDragged) {
+                    hasDragged = false;
+                    return;
+                }
+
                 const rect = renderer.domElement.getBoundingClientRect();
                 pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
                 pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -198,6 +227,8 @@ export function Viewer3D({ data, onReady, onError, onHover, onClick }: Viewer3DP
                 }
             };
 
+            renderer.domElement.addEventListener("pointerdown", onPointerDown);
+            renderer.domElement.addEventListener("pointerup", onPointerUp);
             renderer.domElement.addEventListener("pointermove", onPointerMove);
             renderer.domElement.addEventListener("click", onClickRay);
 
