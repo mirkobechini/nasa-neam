@@ -73,6 +73,7 @@ Progetto personale (poi pubblico) per visualizzare asteroidi vicini alla Terra, 
 
 ## Feature future pianificate
 
+- [ ] Render asteroids as 3D mesh objects (rocce dettagliate, non puntini)
 - [ ] Confronto asteroidi side-by-side
 - [ ] Export CSV dati asteroidi
 - [ ] PWA (installabile come app) — da ultimo
@@ -87,3 +88,6 @@ Progetto personale (poi pubblico) per visualizzare asteroidi vicini alla Terra, 
 - [x] 3D viewer: orbite ad anello troppo complesse (PR #45)
 - [x] 3D viewer: aggiungere controllo velocità (slow/normal/fast) (PR #47)
 - [x] API: gestione parametri data e caching da rivedere (PR #40)
+- [ ] 3D viewer: Earth texture sembra Nettuno, labels asteroidi troppo grandi
+- [ ] Time range filter: custom date picker non funziona
+- [ ] Dashboard: filtro temporale dovrebbe essere in navbar (non in home)
