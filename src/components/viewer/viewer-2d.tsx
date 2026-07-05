@@ -120,14 +120,14 @@ export function Viewer2D({ data, onReady, onHover, onClick }: Viewer2DProps) {
     useEffect(() => {
         const el = containerRef.current;
         if (!el) return;
-        const hWheel = (e: WheelEvent) => {
+        const handleWheel = (e: WheelEvent) => {
             e.preventDefault();
             scaleRef.current = Math.min(3, Math.max(0.3, scaleRef.current * (e.deltaY > 0 ? 0.9 : 1.1)));
             setScale(scaleRef.current);
             draw();
         };
-        el.addEventListener("wheel", hWheel, { passive: false });
-        return () => el.removeEventListener("wheel", hWheel);
+        el.addEventListener("wheel", handleWheel, { passive: false });
+        return () => el.removeEventListener("wheel", handleWheel);
     }, [draw]);
 
     useEffect(() => {
