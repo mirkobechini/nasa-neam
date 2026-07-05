@@ -11,9 +11,10 @@ interface Viewer3DProps {
     onError?: () => void;
     onHover?: (id: string | null) => void;
     onClick?: (id: string) => void;
+    speed?: number;
 }
 
-export function Viewer3D({ data, onReady, onError, onHover, onClick }: Viewer3DProps) {
+export function Viewer3D({ data, onReady, onError, onHover, onClick, speed = 1 }: Viewer3DProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const sceneRef = useRef<{
         scene: THREE.Scene;
@@ -250,20 +251,21 @@ export function Viewer3D({ data, onReady, onError, onHover, onClick }: Viewer3DP
 
             function animate() {
                 animRef.current = requestAnimationFrame(animate);
-                angle += 0.002;
+                angle += 0.002 * speed;
 
-                earth.rotation.y += 0.005;
-                glow.rotation.y += 0.003;
+                earth.rotation.y += 0.005 * speed;
+                glow.rotation.y += 0.003 * speed;
 
                 const pos = particleSystem.geometry.attributes.position.array;
                 astroData.forEach((d, i) => {
-                    d.angle += d.speed;
+                    d.angle += d.speed * speed;
                     pos[i * 3] = Math.cos(d.angle) * d.radius;
                     pos[i * 3 + 2] = Math.sin(d.angle) * d.radius;
                     pos[i * 3 + 1] = d.yOff + Math.sin(angle * 2 + i) * 0.2;
                 });
                 particleSystem.geometry.attributes.position.needsUpdate = true;
 
+                controls.autoRotateSpeed = 1.0 * speed;
                 controls.update();
 
                 renderer.render(scene, camera);
@@ -272,7 +274,7 @@ export function Viewer3D({ data, onReady, onError, onHover, onClick }: Viewer3DP
         } catch {
             onError?.();
         }
-    }, [data, onReady, onError]);
+    }, [data, onReady, onError, speed]);
 
     useEffect(() => {
         initScene();

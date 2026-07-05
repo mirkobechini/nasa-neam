@@ -4,12 +4,14 @@ import { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { Viewer3D } from "@/components/viewer/viewer-3d";
 import { Viewer2D } from "@/components/viewer/viewer-2d";
+import { SpeedControls } from "@/components/viewer/speed-controls";
 import { AsteroidModal } from "@/components/viewer/asteroid-modal";
 import type { AsteroidData } from "@/lib/types";
 
 export default function ViewerPage() {
   const t = useTranslations("visualization");
   const [mode, setMode] = useState<"3d" | "2d">("3d");
+  const [speed, setSpeed] = useState<number>(1);
   const [data, setData] = useState<AsteroidData[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -56,13 +58,18 @@ export default function ViewerPage() {
           <h1 className="font-heading text-2xl font-bold">{t("title")}</h1>
           <p className="text-xs text-muted-foreground mt-0.5">{t("subtitle")}</p>
         </div>
-        <div className="flex bg-muted rounded-lg p-0.5">
-          <button onClick={() => setMode("3d")}
-            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${mode === "3d" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
-          >{t("switch3d")}</button>
-          <button onClick={() => setMode("2d")}
-            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${mode === "2d" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
-          >{t("switch2d")}</button>
+        <div className="flex gap-2 flex-wrap">
+          <div className="flex bg-muted rounded-lg p-0.5">
+            <button onClick={() => setMode("3d")}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${mode === "3d" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            >{t("switch3d")}</button>
+            <button onClick={() => setMode("2d")}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${mode === "2d" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            >{t("switch2d")}</button>
+          </div>
+          {mode === "3d" && (
+            <SpeedControls speed={speed} onSpeedChange={setSpeed} />
+          )}
         </div>
       </div>
 
@@ -95,7 +102,7 @@ export default function ViewerPage() {
 
       <div className={loading && !webglReady ? "hidden" : ""}>
         {mode === "3d" && data && !webglFailed && (
-          <Viewer3D data={data} onReady={handle3dReady} onError={handle3dError} onHover={setHoveredId} onClick={setSelectedId} />
+          <Viewer3D data={data} onReady={handle3dReady} onError={handle3dError} onHover={setHoveredId} onClick={setSelectedId} speed={speed} />
         )}
         {mode === "2d" && data && (
           <Viewer2D data={data} onReady={() => setLoading(false)} onHover={setHoveredId} onClick={setSelectedId} />
