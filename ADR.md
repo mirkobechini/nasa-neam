@@ -92,4 +92,5 @@ Progetto personale (poi pubblico) per visualizzare asteroidi vicini alla Terra, 
 - [x] Time range filter: custom date picker non funziona (PR #50)
 - [x] Dashboard: filtro temporale in home, non in navbar (PR #51)
 - [ ] Navbar: posizionamento barra periodo da risistemare (layout poco pulito)
+- [ ] Time range persistence: periodo persiste tra pagine, ma dati non corrispondono
 - [ ] Dashboard: posizionamento barra periodo da risistemare (navbar layout tweaks)
