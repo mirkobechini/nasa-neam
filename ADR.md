@@ -81,6 +81,7 @@ Progetto personale (poi pubblico) per visualizzare asteroidi vicini alla Terra, 
 - [x] Language switcher crash — URL invalido su cambio lingua (PR #34)
 - [x] 2D viewer: legenda, drag, click/hit fix (PR #36)
 - [x] Dashboard: filtro temporale non funziona (3/7gg/custom) (PR #38)
+- [ ] Dashboard: date range estesi (es. marzo-maggio) rimangono in "waiting" (Issue #41)
 - [ ] 3D viewer: click-drag conflict (click dopo drag apre modal)
 - [ ] 3D viewer: orbite ad anello troppo complesse
 - [ ] 3D viewer: aggiungere controllo velocità (slow/normal/fast)
