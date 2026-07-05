@@ -28,4 +28,9 @@ Migliorare il viewer 3D con texture della Terra in stile anime, label sugli aste
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata — PR #49 (2026-07-05)
+
+- Earth texture generator with anime-style gradient and continents
+- Asteroid labels showing name and distance
+- Dynamic label positioning that follows asteroids
+- 2 new tests added, 71 total tests passing
