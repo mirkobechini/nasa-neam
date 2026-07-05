@@ -12,4 +12,7 @@ Il filtro temporale nella Dashboard (3gg, 7gg, custom) non cambia effettivamente
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata
+
+- **Completata il:** 2026-07-05
+- **Note:** Aggiunto filtro per `closeApproach` date nel database invece di `fetchedAt`. API route ora accetta `start_date`/`end_date` dalla query. DashboardPage passa parametri data per tutti i range (3d, 7d, custom). Custom range con date picker funzionante.
