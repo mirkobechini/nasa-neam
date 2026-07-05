@@ -20,4 +20,9 @@ Aggiungere uno stato `isLoading` che mostra un overlay o testo durante il fetch 
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata — PR #48 (2026-07-05)
+
+- HeroStats: "Loading asteroid data..." with animated pulse dot
+- BubbleChart: "Loading chart data..." with animated pulse dot
+- HazardBarChart: "Loading chart data..." with animated pulse dot
+- 3 new tests added, 69 total tests passing
