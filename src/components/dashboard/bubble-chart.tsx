@@ -31,7 +31,15 @@ export function BubbleChart({ data, loading, error }: BubbleChartProps) {
                     <Skeleton className="h-5 w-48" />
                 </CardHeader>
                 <CardContent>
-                    <Skeleton className="h-64 w-full" />
+                    <div className="h-64 flex items-center justify-center">
+                        <div className="text-center">
+                            <div className="text-sm text-muted-foreground flex items-center justify-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                                Loading chart data...
+                            </div>
+                            <Skeleton className="h-56 w-full mt-4" />
+                        </div>
+                    </div>
                 </CardContent>
             </Card>
         );
