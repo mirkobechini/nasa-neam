@@ -74,6 +74,7 @@ Progetto personale (poi pubblico) per visualizzare asteroidi vicini alla Terra, 
 ## Feature future pianificate
 
 - [x] Render asteroids as 3D mesh objects (rocce dettagliate, non puntini) (PR #54)
+- [ ] 2D viewer visual improvements (Earth anime-style image + asteroid anime images with hazard borders, proporzionato per sizeM)
 - [ ] Confronto asteroidi side-by-side
 - [ ] Export CSV dati asteroidi
 - [ ] PWA (installabile come app) — da ultimo
