@@ -45,7 +45,7 @@ This document defines the **git workflow** that the AI agent must follow for eve
 
 ### 1. Plan — Create an Issue
 
-For every **feature**, create an issue with:
+For every **feature** or **fix**, create an issue with:
 
 - **Title**: concise feature description
 - **Body**: detailed description, acceptance criteria, technical notes
@@ -53,7 +53,7 @@ For every **feature**, create an issue with:
 
 Use the `mcp_gitkraken_cli_issues_create` tool (or project's issue tracker). The issue number determines the branch name.
 
-> **Right after creating the issue**, write in the issue body the **complete list of expected atomic commits** (e.g. `feat(api): add User model`, `feat(api): add POST /auth/register`, `test(api): add auth tests`). This list serves as a roadmap — each commit must be executed exactly as planned before moving to the next. If an extra commit becomes necessary during implementation, add it to the list.
+> **Right after creating the issue**, write in the issue body the **complete list of expected sub-tasks** (e.g. `feat(api): add User model`, `feat(api): add POST /auth/register`, `test(api): add auth tests`). This list serves as a roadmap — each sub-task must be executed exactly as planned before moving to the next. If an extra sub-task becomes necessary during implementation, add it to the list.
 
 ### 2. Branching — one branch per issue
 
@@ -63,25 +63,44 @@ git checkout -b feature/<issue-number>-<short-description>
 git push origin feature/<issue-number>-<short-description>
 ```
 
-### 3. Implementation & commit loop
+### 3. Sub-task loop — implement → test → commit
 
-While inside the feature branch, implement **one atomic unit at a time**, **commit immediately**, then move to the next unit.
-
-An **atomic unit** is a single file or logical change: a component, a utility, a test file, a translation update. Do NOT batch multiple files into one commit.
+Each issue is decomposed into **sub-tasks** (atomic units). For **each** sub-task, follow this exact cycle:
 
 ```bash
 # Inside the feature branch
 git checkout feature/<issue-number>-<short-description>
 
-# === SUBTASK 1: Write file A ===
+# === SUB-TASK: implement ===
+# Write ONE file (e.g. a component, a utility, a route handler)
+# Do NOT commit yet
+
+# === SUB-TASK: test ===
+# Run the tests for this specific sub-task
+# If tests FAIL → fix the code → run tests again → repeat until ALL pass
+# If tests PASS → proceed to commit
+
+# === SUB-TASK: commit ===
+git add <file(s)>
+git commit -m "<type>(<scope>): <description>"
+git push origin feature/<issue-number>-<short-description>
+```
+
+> ⚠️ **Critical rule:** For each sub-task, you MUST run the relevant tests **before** committing. If tests fail, fix the code and re-run tests until they all pass. Only then commit and move to the next sub-task.
+
+An **atomic unit** is a single file or logical change: a component, a utility, a test file, a translation update. Do NOT batch multiple files into one commit.
+
+```bash
+# === SUB-TASK 1: Write file A (implementation) ===
 # Write ONE file (e.g. a component)
-# Stage and commit immediately
+# Run tests for file A → if fail, fix → repeat until pass
 git add <file-A>
 git commit -m "<type>(<scope>): <description of file A>"
 git push origin feature/<issue-number>-<short-description>
 
-# === SUBTASK 2: Write file B ===
+# === SUB-TASK 2: Write file B (tests for file A) ===
 # Write ONE file (e.g. tests for file A)
+# Run tests for file B → if fail, fix → repeat until pass
 git add <file-B>
 git commit -m "test(<scope>): <description of test file B>"
 git push origin feature/<issue-number>-<short-description>
@@ -94,7 +113,7 @@ git push origin feature/<issue-number>-<short-description>
 >
 > **Tests go in separate commits.** Do not bundle tests into the same commit as the feature code.
 
-Valid commit sequence example for one issue:
+Valid sub-task sequence example for one issue:
 
 ```
 feat(api): add User model
@@ -115,9 +134,21 @@ Scope: api, ui, cli, core, ci, docs, deps
 
 Always put `closes #<issue-number>` in the **PR body** (not the commit message), so the issue auto-closes on merge.
 
-### 4. PR, Merge & cleanup
+### 4. Pre-PR — full test suite verification
 
-Once **ALL atomic units** (code + tests) are committed and pushed:
+Before creating the Pull Request, you MUST run **ALL tests for the entire issue** to ensure nothing is broken:
+
+```bash
+# Run the full test suite for this issue
+# If ALL tests pass → proceed to PR
+# If ANY test fails → fix the failing test(s) → re-run full suite → repeat until ALL pass
+```
+
+Only after the full suite is green, proceed to the PR phase.
+
+### 5. PR, Merge & cleanup
+
+Once **ALL sub-tasks** (code + tests) are committed and pushed, and the full test suite passes:
 
 > 💡 **Keep your branch in sync**: during development, periodically rebase on `dev` to avoid large conflicts later. Prefer small, frequent rebases over a single painful one.
 
@@ -149,7 +180,7 @@ git branch -d feature/<issue-number>-<short-description>
 
 > ⚠️ Use `--merge` (not `--squash`) to preserve atomic commit history on `dev`. GitHub should auto-close the issue because the PR body contains `closes #N`. However, this occasionally fails. **Always verify** with `gh issue list` after merge. If still open, close manually with `gh issue close <number>`.
 
-### 5. After merge — update progress & close issue
+### 6. After merge — update progress & close issue
 
 After the PR is merged:
 
