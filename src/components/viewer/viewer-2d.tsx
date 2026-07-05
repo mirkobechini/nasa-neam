@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useCallback, useState, useMemo } from "react";
+import { createEarth2DAnime, createAsteroid2DSprite2D } from "@/lib/earth-texture";
 import type { AsteroidData } from "@/lib/types";
 
 interface Viewer2DProps {
@@ -18,6 +19,8 @@ export function Viewer2D({ data, onReady, onHover, onClick }: Viewer2DProps) {
     const positionsRef = useRef<{ id: string; x: number; y: number; size: number }[]>([]);
     const panRef = useRef({ x: 0, y: 0 });
     const dragRef = useRef({ startX: 0, startY: 0, isDragging: false, moved: false });
+    const earthCanvasRef = useRef<HTMLCanvasElement | null>(null);
+    const asteroidCanvasesRef = useRef<Map<string, HTMLCanvasElement>>(new Map());
 
     const fixedPositions = useMemo(() => {
         if (!data) return [];
@@ -60,36 +63,35 @@ export function Viewer2D({ data, onReady, onHover, onClick }: Viewer2DProps) {
         ctx.scale(s, s);
         ctx.translate(-cx, -cy);
 
-        ctx.beginPath();
-        ctx.arc(w / 2, h / 2, 20, 0, Math.PI * 2);
-        ctx.fillStyle = "#4fc3f7";
-        ctx.fill();
-        ctx.shadowColor = "#4fc3f7";
-        ctx.shadowBlur = 30;
-        ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 10px monospace";
-        ctx.textAlign = "center";
-        ctx.fillText("🌍", w / 2, h / 2 + 3);
+        // Draw anime-style Earth
+        if (!earthCanvasRef.current) {
+            earthCanvasRef.current = createEarth2DAnime(200);
+        }
+        const earthImg = earthCanvasRef.current;
+        ctx.drawImage(earthImg, w / 2 - 100, h / 2 - 100, 200, 200);
 
         const pos: { id: string; x: number; y: number; size: number }[] = [];
         fixedPositions.forEach((a) => {
             const x = a.x - (999 - w / 2);
             const y = a.y - (999 - h / 2);
-            pos.push({ id: a.id, x, y, size: a.size });
-            ctx.beginPath();
-            ctx.arc(x, y, a.size, 0, Math.PI * 2);
-            ctx.fillStyle = a.hazardous ? "rgba(255,82,82,0.8)" : "rgba(79,195,247,0.7)";
-            ctx.fill();
-            ctx.strokeStyle = a.hazardous ? "rgba(255,82,82,1)" : "rgba(79,195,247,0.9)";
-            ctx.lineWidth = 1;
-            ctx.stroke();
-            if (a.size > 4) {
+            
+            // Generate or get asteroid sprite
+            if (!asteroidCanvasesRef.current.has(a.id)) {
+                const sprite = createAsteroid2DSprite2D(a.name, a.size * 80, a.hazardous);
+                asteroidCanvasesRef.current.set(a.id, sprite);
+            }
+            const asteroidImg = asteroidCanvasesRef.current.get(a.id)!;
+            
+            const spriteSize = asteroidImg.width / 2;
+            ctx.drawImage(asteroidImg, x - spriteSize / 2, y - spriteSize / 2, spriteSize, spriteSize);
+            
+            pos.push({ id: a.id, x, y, size: spriteSize / 2 });
+            
+            if (spriteSize > 20) {
                 ctx.fillStyle = "#c0c0d0";
                 ctx.font = "8px monospace";
                 ctx.textAlign = "center";
-                ctx.fillText(a.name, x, y - a.size - 4);
+                ctx.fillText(a.name, x, y - spriteSize / 2 - 8);
             }
         });
         positionsRef.current = pos;

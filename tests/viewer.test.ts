@@ -16,14 +16,14 @@ describe("Trajectory Viewer", () => {
     expect(content).toContain("for (let i = 0; i < 2;");
   });
 
-  it("should have Viewer2D component with Canvas", () => {
+  it("should have Viewer2D component with Canvas and anime sprites", () => {
     const content = fs.readFileSync(
       "src/components/viewer/viewer-2d.tsx",
       "utf-8",
     );
     expect(content).toContain("Viewer2D");
     expect(content).toContain("getContext");
-    expect(content).toContain("arc");
+    expect(content).toContain("drawImage");
     expect(content).toContain("fillText");
   });
 
@@ -117,5 +117,33 @@ describe("Trajectory Viewer", () => {
     expect(content).toContain("MeshPhongMaterial");
     expect(content).toContain("hazardous");
     expect(content).toContain("sizeM");
+  });
+
+  it("should have 2D anime-style earth generator", () => {
+    const content = fs.readFileSync("src/lib/earth-texture.ts", "utf-8");
+    expect(content).toContain("createEarth2DAnime");
+    expect(content).toContain("HTMLCanvasElement");
+    expect(content).toContain("ellipse");
+  });
+
+  it("should have 2D anime-style asteroid sprite generator with proportional sizing", () => {
+    const content = fs.readFileSync("src/lib/earth-texture.ts", "utf-8");
+    expect(content).toContain("createAsteroid2DSprite2D");
+    expect(content).toContain("sizeM");
+    expect(content).toContain("isHazardous");
+    expect(content).toContain("canvasSize");
+    expect(content).toContain("logarithmic");
+  });
+
+  it("should integrate 2D sprites in Viewer2D", () => {
+    const content = fs.readFileSync(
+      "src/components/viewer/viewer-2d.tsx",
+      "utf-8",
+    );
+    expect(content).toContain("createEarth2DAnime");
+    expect(content).toContain("createAsteroid2DSprite2D");
+    expect(content).toContain("earthCanvasRef");
+    expect(content).toContain("asteroidCanvasesRef");
+    expect(content).toContain("drawImage");
   });
 });
