@@ -77,6 +77,21 @@ describe("Dashboard components", () => {
     expect(filter).toContain('type="date"');
   });
 
+  it("should have custom date picker with validation", () => {
+    const filter = fs.readFileSync(
+      "src/components/dashboard/time-range-filter.tsx",
+      "utf-8",
+    );
+    // Should have isCustom state
+    expect(filter).toContain("isCustom");
+    expect(filter).toContain("setIsCustom");
+    // Should validate dates
+    expect(filter).toContain("minDate >= maxDate");
+    expect(filter).toContain("Start date must be before end date");
+    // Should show error message
+    expect(filter).toContain("error");
+  });
+
   it("should show loading text indicator in HeroStats", () => {
     const content = fs.readFileSync(
       "src/components/dashboard/hero-stats.tsx",
