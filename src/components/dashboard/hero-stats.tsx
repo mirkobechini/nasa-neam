@@ -17,13 +17,19 @@ export function HeroStats({ data, loading, error, onRetry }: HeroStatsProps) {
 
     if (loading) {
         return (
-            <div className="flex justify-center gap-10 flex-wrap mt-10">
-                {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="text-center">
-                        <Skeleton className="w-20 h-8 mx-auto mb-2" />
-                        <Skeleton className="w-24 h-4 mx-auto" />
-                    </div>
-                ))}
+            <div className="mt-10 text-center">
+                <div className="text-sm text-muted-foreground mb-6 flex items-center justify-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                    Loading asteroid data...
+                </div>
+                <div className="flex justify-center gap-10 flex-wrap">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                        <div key={i} className="text-center">
+                            <Skeleton className="w-20 h-8 mx-auto mb-2" />
+                            <Skeleton className="w-24 h-4 mx-auto" />
+                        </div>
+                    ))}
+                </div>
             </div>
         );
     }
