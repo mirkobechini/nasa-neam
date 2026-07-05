@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { nasaConfig, buildNasaUrl } from "@/lib/nasa";
+import {
+  parseAsteroidData,
+  upsertAsteroid,
+  buildDateFilter,
+  fetchFromNasaAndCache,
+} from "@/lib/neo";
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,111 +22,29 @@ export async function GET(request: NextRequest) {
         .toISOString()
         .split("T")[0];
 
-    // Check cache first
+    // Ensure cache is populated at least once
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     const cachedCount = await prisma.asteroid.count({
-      where: {
-        fetchedAt: { gte: sevenDaysAgo },
-      },
+      where: { fetchedAt: { gte: sevenDaysAgo } },
     });
 
-    // If we have cached data, return it
-    if (cachedCount > 0) {
-      const asteroids = await prisma.asteroid.findMany({
-        where: { fetchedAt: { gte: sevenDaysAgo } },
-        orderBy: { distKm: "asc" },
-      });
-
-      return NextResponse.json({
-        source: "cache",
-        count: asteroids.length,
-        data: asteroids,
-      });
+    if (cachedCount === 0) {
+      await fetchFromNasaAndCache();
     }
 
-    // Fetch from NASA API
-    const url = buildNasaUrl("/feed", {
-      start_date: start,
-      end_date: end,
+    // Filter by close approach date range
+    const dateFilter = buildDateFilter(startDate, endDate);
+
+    const asteroids = await prisma.asteroid.findMany({
+      where: { closeApproach: dateFilter },
+      orderBy: { distKm: "asc" },
     });
-
-    const response = await fetch(url);
-    const apiData = await response.json();
-
-    // Log API call for rate limiting
-    await prisma.apiCallLog.create({
-      data: {
-        endpoint: "/feed",
-        status: response.status,
-      },
-    });
-
-    if (!response.ok) {
-      return NextResponse.json(
-        { error: "NASA API error", details: apiData },
-        { status: response.status },
-      );
-    }
-
-    // Parse and store asteroids
-    const nearEarthObjects = apiData.near_earth_objects || {};
-    const asteroids = Object.values(nearEarthObjects).flat() as any[];
-    const now = new Date();
-
-    const stored = [];
-    for (const obj of asteroids) {
-      const closeApproach = obj.close_approach_data?.[0];
-      const distKm = closeApproach
-        ? parseFloat(closeApproach.miss_distance?.kilometers || "0")
-        : 0;
-      const velocityKmh = closeApproach
-        ? parseFloat(
-            closeApproach.relative_velocity?.kilometers_per_hour || "0",
-          )
-        : 0;
-      const sizeM = obj.estimated_diameter?.meters?.estimated_diameter_max || 0;
-
-      const asteroid = await prisma.asteroid.upsert({
-        where: { id: obj.id },
-        update: {
-          distKm,
-          sizeM,
-          velocityKmh,
-          hazardous: obj.is_potentially_hazardous_asteroid || false,
-          closeApproach: closeApproach
-            ? new Date(
-                closeApproach.close_approach_date_full ||
-                  closeApproach.close_approach_date,
-              )
-            : null,
-          rawJson: JSON.stringify(obj),
-          fetchedAt: now,
-        },
-        create: {
-          id: obj.id,
-          name: obj.name || obj.designation || `NEO-${obj.id}`,
-          distKm,
-          sizeM,
-          velocityKmh,
-          hazardous: obj.is_potentially_hazardous_asteroid || false,
-          closeApproach: closeApproach
-            ? new Date(
-                closeApproach.close_approach_date_full ||
-                  closeApproach.close_approach_date,
-              )
-            : null,
-          orbitBody: closeApproach?.orbiting_body || "Earth",
-          rawJson: JSON.stringify(obj),
-          fetchedAt: now,
-        },
-      });
-      stored.push(asteroid);
-    }
 
     return NextResponse.json({
-      source: "nasa",
-      count: stored.length,
-      data: stored,
+      source: cachedCount === 0 && asteroids.length > 0 ? "nasa" : "cache",
+      count: asteroids.length,
+      data: asteroids,
+      dateRange: { start, end },
     });
   } catch (error) {
     console.error("Feed API error:", error);
