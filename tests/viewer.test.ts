@@ -11,8 +11,8 @@ describe("Trajectory Viewer", () => {
     expect(content).toContain("THREE");
     expect(content).toContain("WebGLRenderer");
     expect(content).toContain("SphereGeometry");
-    expect(content).toContain("PointsMaterial");
-    expect(content).toContain("simplified");
+    expect(content).toContain("createAsteroidMesh");
+    expect(content).toContain("MeshPhongMaterial");
     expect(content).toContain("for (let i = 0; i < 2;");
   });
 
@@ -103,8 +103,19 @@ describe("Trajectory Viewer", () => {
     );
     expect(content).toContain("createEarthTexture");
     expect(content).toContain("createAsteroidLabel");
+    expect(content).toContain("createAsteroidMesh");
     expect(content).toContain("earthTexture");
     expect(content).toContain("labels");
     expect(content).toContain("labels[i].position");
+    expect(content).toContain("asteroidMeshes");
+  });
+
+  it("should have createAsteroidMesh function for 3D rocky appearance", () => {
+    const content = fs.readFileSync("src/lib/earth-texture.ts", "utf-8");
+    expect(content).toContain("createAsteroidMesh");
+    expect(content).toContain("IcosahedronGeometry");
+    expect(content).toContain("MeshPhongMaterial");
+    expect(content).toContain("hazardous");
+    expect(content).toContain("sizeM");
   });
 });
