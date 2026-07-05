@@ -33,7 +33,7 @@ Progetto personale (poi pubblico) per visualizzare asteroidi vicini alla Terra, 
 - **Proxy Cache API** — backend Next.js che chiama NASA NeoWs con caching (SQLite)
 - **Rate Limit Monitor** — contatore chiamate API visibile in UI
 - **Toggle Suoni** — attivazione/disattivazione effetti sonori
-- **Filtro Temporale** — selezione periodo di dati (3gg, 7gg, custom)
+- **Filtro Temporale** — selezione periodo di dati (3gg, 7gg, custom) — **persistente tra tutte le schede (PR #46)**
 - **Confronto Asteroidi** — side-by-side comparison (feature futura)
 - **Export CSV** — download dati asteroidi (feature futura)
 - **PWA** — installabile come app (feature futura, da ultimo)

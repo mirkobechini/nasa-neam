@@ -21,13 +21,21 @@ Aggiungere il time range filter (3 days, 7 days, custom) a tutte le schede (dash
 - Feature #3 Dashboard già implementata (contiene il TimeRangeFilter component)
 - API routes (`/api/neo/feed`, `/api/neo/[id]`, etc.) già supportano `dateMin` e `dateMax`
 
-## Sub-tasks
-
-1. Creare TimeRangeContext per condividere stato globale
-2. Spostare TimeRangeFilter dalla dashboard page al layout/navbar
-3. Usare il contexto in dashboard, catalog, e altre pagine
-4. Testare persistenza tra cambio schede
-
 ## Status
 
-[ ] Non iniziata
+[x] Completata — Risolto in PR #46
+
+## Implementazione eseguita
+
+- **TimeRangeContext.tsx** — Context e hook useTimeRange per stato globale
+- **ClientProviders.tsx** — Wrapper centralizzato per i provider (Theme, TimeRange, etc.)
+- **time-range-filter.tsx** — Integrato con useTimeRange per persistence
+- **navbar-wrapper.tsx** — TimeRangeFilter globale nella navbar
+- **dashboard page** — Usa useTimeRange per recuperare selezione persistente
+- **Tests** — persistent-time-range.test.ts e dashboard.test.ts aggiornati
+
+## Note
+
+- Merge effettuato 2026-07-05
+- Suite: 14 test files, 63 test — tutti passati ✓
+- Il filtro persiste tra tutte le schede/navigazioni
