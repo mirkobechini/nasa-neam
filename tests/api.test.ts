@@ -46,9 +46,9 @@ describe("API routes structure", () => {
   it("should have feed route with GET export", () => {
     const content = fs.readFileSync("src/app/api/neo/feed/route.ts", "utf-8");
     expect(content).toContain("export async function GET");
-    expect(content).toContain("prisma.asteroid.count");
     expect(content).toContain("closeApproach");
-    expect(content).toContain("fetchFromNasaAndCache");
+    expect(content).toContain("ensureRangeCached");
+    expect(content).toContain("buildDateFilter");
   });
 
   it("should have [id] route with GET export", () => {
@@ -126,14 +126,13 @@ describe("Shared neo library", () => {
     const content = fs.readFileSync("src/app/api/neo/stats/route.ts", "utf-8");
     expect(content).toContain('from "@/lib/neo"');
     expect(content).toContain("buildDateFilter");
-    expect(content).toContain("fetchFromNasaAndCache");
+    expect(content).toContain("ensureRangeCached");
   });
 
   it("should have feed route using shared neo library", () => {
     const content = fs.readFileSync("src/app/api/neo/feed/route.ts", "utf-8");
     expect(content).toContain('from "@/lib/neo"');
-    expect(content).toContain("parseAsteroidData");
     expect(content).toContain("buildDateFilter");
-    expect(content).toContain("fetchFromNasaAndCache");
+    expect(content).toContain("ensureRangeCached");
   });
 });

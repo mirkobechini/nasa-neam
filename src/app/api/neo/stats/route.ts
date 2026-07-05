@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { buildDateFilter, fetchFromNasaAndCache } from "@/lib/neo";
+import { buildDateFilter, ensureRangeCached } from "@/lib/neo";
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,17 +8,21 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get("start_date");
     const endDate = searchParams.get("end_date");
 
-    // Ensure cache is populated at least once
-    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const cachedCount = await prisma.asteroid.count({
-      where: { fetchedAt: { gte: sevenDaysAgo } },
-    });
+    const start =
+      startDate ||
+      new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0];
+    const end = endDate || new Date().toISOString().split("T")[0];
 
-    if (cachedCount === 0) {
-      await fetchFromNasaAndCache();
+    const requestedRange = { start, end };
+    if (!(await ensureRangeCached(requestedRange))) {
+      return NextResponse.json(
+        { error: "Failed to cache requested date range" },
+        { status: 500 },
+      );
     }
 
-    // Filter by close approach date range
     const dateFilter = buildDateFilter(startDate, endDate);
 
     const asteroids = await prisma.asteroid.findMany({

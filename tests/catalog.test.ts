@@ -41,7 +41,6 @@ describe("Asteroid Catalog", () => {
   it("should have /api/neo/feed returning data array", () => {
     const content = fs.readFileSync("src/app/api/neo/feed/route.ts", "utf-8");
     expect(content).toContain("export async function GET");
-    expect(content).toContain("prisma.asteroid.upsert");
-    expect(content).toContain("buildNasaUrl");
+    expect(content).toContain("ensureRangeCached");
   });
 });
