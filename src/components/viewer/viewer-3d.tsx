@@ -3,7 +3,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { createEarthTexture, createAsteroidLabel } from "@/lib/earth-texture";
+import { createEarthTexture, createAsteroidLabel, createAsteroidMesh } from "@/lib/earth-texture";
 import type { AsteroidData } from "@/lib/types";
 
 interface Viewer3DProps {
@@ -21,7 +21,7 @@ export function Viewer3D({ data, onReady, onError, onHover, onClick, speed = 1 }
         scene: THREE.Scene;
         camera: THREE.PerspectiveCamera;
         renderer: THREE.WebGLRenderer;
-        particleSystem: THREE.Points;
+        asteroidMeshes: THREE.Mesh[];
         astroData: { angle: number; radius: number; yOff: number; speed: number }[];
         earth: THREE.Mesh;
         glow: THREE.Mesh;
@@ -94,20 +94,18 @@ export function Viewer3D({ data, onReady, onError, onHover, onClick, speed = 1 }
             pointLight.position.set(-3, 2, 4);
             scene.add(pointLight);
 
-            // Asteroid particles
+            // Asteroid meshes (3D rocky appearance)
             const items = data || [];
             const count = Math.min(items.length, 40);
-            const positions = new Float32Array(count * 3);
-            const colors = new Float32Array(count * 3);
             const astroData: {
                 angle: number;
                 radius: number;
                 yOff: number;
                 speed: number;
-                name: string;
-                distKm: number;
             }[] = [];
             const labels: THREE.Sprite[] = [];
+            const asteroidMeshes: THREE.Mesh[] = [];
+            const asteroidIds = items.slice(0, count).map((a) => a.id);
 
             items.slice(0, count).forEach((a, i) => {
                 const angle = Math.random() * Math.PI * 2;
@@ -118,24 +116,25 @@ export function Viewer3D({ data, onReady, onError, onHover, onClick, speed = 1 }
                     radius,
                     yOff,
                     speed: 0.002 + Math.random() * 0.008,
-                    name: a.name,
-                    distKm: a.distKm,
                 });
-                positions[i * 3] = Math.cos(angle) * radius;
-                positions[i * 3 + 1] = yOff;
-                positions[i * 3 + 2] = Math.sin(angle) * radius;
-                const c = a.hazardous ? [1, 0.3, 0.3] : [0.3, 0.8, 1];
-                colors[i * 3] = c[0];
-                colors[i * 3 + 1] = c[1];
-                colors[i * 3 + 2] = c[2];
+
+                // Create 3D asteroid mesh
+                const mesh = createAsteroidMesh(a.sizeM, a.hazardous);
+                mesh.position.set(
+                    Math.cos(angle) * radius,
+                    yOff,
+                    Math.sin(angle) * radius
+                );
+                asteroidMeshes.push(mesh);
+                scene.add(mesh);
 
                 // Create label for asteroid
                 try {
                     const label = createAsteroidLabel(a.name, a.distKm);
                     label.position.set(
-                        positions[i * 3],
-                        positions[i * 3 + 1] + 1,
-                        positions[i * 3 + 2]
+                        mesh.position.x,
+                        mesh.position.y + 1,
+                        mesh.position.z
                     );
                     labels.push(label);
                     scene.add(label);
@@ -143,20 +142,6 @@ export function Viewer3D({ data, onReady, onError, onHover, onClick, speed = 1 }
                     // Silently skip label if creation fails
                 }
             });
-
-            const particleGeo = new THREE.BufferGeometry();
-            particleGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-            particleGeo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-
-            const particleMat = new THREE.PointsMaterial({
-                size: 0.15,
-                vertexColors: true,
-                transparent: true,
-                opacity: 0.9,
-                blending: THREE.AdditiveBlending,
-            });
-            const particleSystem = new THREE.Points(particleGeo, particleMat);
-            scene.add(particleSystem);
 
             camera.position.set(4, 3, 6);
             camera.lookAt(0, 0, 0);
@@ -174,13 +159,12 @@ export function Viewer3D({ data, onReady, onError, onHover, onClick, speed = 1 }
             // Raycaster for hover/click
             const raycaster = new THREE.Raycaster();
             const pointer = new THREE.Vector2();
-            let hoveredId: string | null = null;
+            let hoveredIdx: number | null = null;
             let pointerDown = false;
             let hasDragged = false;
             const dragThreshold = 5;
             const dragThresholdSq = dragThreshold * dragThreshold;
             const pointerDownPos = { x: 0, y: 0 };
-            const asteroidIds = (data || []).slice(0, 40).map((a) => a.id);
 
             const onPointerMove = (event: MouseEvent) => {
                 if (pointerDown && !hasDragged) {
@@ -196,22 +180,23 @@ export function Viewer3D({ data, onReady, onError, onHover, onClick, speed = 1 }
                 pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
                 raycaster.setFromCamera(pointer, camera);
-                const intersects = raycaster.intersectObjects([particleSystem]);
+                const intersects = raycaster.intersectObjects(asteroidMeshes);
 
                 if (intersects.length > 0) {
-                    const idx = intersects[0].index;
-                    if (idx !== undefined && idx < asteroidIds.length) {
+                    const mesh = intersects[0].object;
+                    const idx = asteroidMeshes.indexOf(mesh as THREE.Mesh);
+                    if (idx !== -1 && idx < asteroidIds.length) {
                         const id = asteroidIds[idx];
-                        if (id !== hoveredId) {
-                            hoveredId = id;
+                        if (idx !== hoveredIdx) {
+                            hoveredIdx = idx;
                             onHover?.(id);
                             renderer.domElement.style.cursor = "pointer";
                         }
                         return;
                     }
                 }
-                if (hoveredId !== null) {
-                    hoveredId = null;
+                if (hoveredIdx !== null) {
+                    hoveredIdx = null;
                     onHover?.(null);
                     renderer.domElement.style.cursor = "default";
                 }
@@ -239,11 +224,12 @@ export function Viewer3D({ data, onReady, onError, onHover, onClick, speed = 1 }
                 pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
                 raycaster.setFromCamera(pointer, camera);
-                const intersects = raycaster.intersectObjects([particleSystem]);
+                const intersects = raycaster.intersectObjects(asteroidMeshes);
 
                 if (intersects.length > 0) {
-                    const idx = intersects[0].index;
-                    if (idx !== undefined && idx < asteroidIds.length) {
+                    const mesh = intersects[0].object;
+                    const idx = asteroidMeshes.indexOf(mesh as THREE.Mesh);
+                    if (idx !== -1 && idx < asteroidIds.length) {
                         onClick?.(asteroidIds[idx]);
                     }
                 }
@@ -258,7 +244,7 @@ export function Viewer3D({ data, onReady, onError, onHover, onClick, speed = 1 }
                 scene,
                 camera,
                 renderer,
-                particleSystem,
+                asteroidMeshes,
                 astroData,
                 earth,
                 glow,
@@ -277,21 +263,27 @@ export function Viewer3D({ data, onReady, onError, onHover, onClick, speed = 1 }
                 earth.rotation.y += 0.005 * speed;
                 glow.rotation.y += 0.003 * speed;
 
-                const pos = particleSystem.geometry.attributes.position.array;
                 astroData.forEach((d, i) => {
                     d.angle += d.speed * speed;
-                    pos[i * 3] = Math.cos(d.angle) * d.radius;
-                    pos[i * 3 + 2] = Math.sin(d.angle) * d.radius;
-                    pos[i * 3 + 1] = d.yOff + Math.sin(angle * 2 + i) * 0.2;
+                    const x = Math.cos(d.angle) * d.radius;
+                    const z = Math.sin(d.angle) * d.radius;
+                    const y = d.yOff + Math.sin(angle * 2 + i) * 0.2;
+
+                    // Update asteroid mesh position
+                    if (asteroidMeshes[i]) {
+                        asteroidMeshes[i].position.set(x, y, z);
+                        // Rotate mesh for visual effect
+                        asteroidMeshes[i].rotation.x += 0.01 * speed;
+                        asteroidMeshes[i].rotation.y += 0.015 * speed;
+                    }
 
                     // Update label position to follow asteroid
                     if (labels[i]) {
-                        labels[i].position.x = pos[i * 3];
-                        labels[i].position.y = pos[i * 3 + 1] + 1;
-                        labels[i].position.z = pos[i * 3 + 2];
+                        labels[i].position.x = x;
+                        labels[i].position.y = y + 1;
+                        labels[i].position.z = z;
                     }
                 });
-                particleSystem.geometry.attributes.position.needsUpdate = true;
 
                 controls.autoRotateSpeed = 1.0 * speed;
                 controls.update();

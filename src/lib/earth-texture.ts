@@ -243,3 +243,69 @@ export function createAsteroidLabel(
 
   return sprite;
 }
+
+/**
+ * Creates a 3D rocky asteroid mesh with random distortion.
+ * Simulates crater surface with a jagged rocky appearance.
+ */
+export function createAsteroidMesh(
+  sizeM: number,
+  hazardous: boolean,
+): THREE.Mesh {
+  // Base geometry: icosahedron for irregular rocky shape
+  const geometry = new THREE.IcosahedronGeometry(0.2, 4);
+
+  // Distort vertices for rocky appearance
+  const positionAttr = geometry.getAttribute("position");
+  const positions = positionAttr.array as Float32Array;
+
+  for (let i = 0; i < positions.length; i += 3) {
+    const x = positions[i];
+    const y = positions[i + 1];
+    const z = positions[i + 2];
+
+    // Random distortion per vertex for jagged effect
+    const distortion = 0.1 + Math.random() * 0.15;
+    const length = Math.sqrt(x * x + y * y + z * z);
+
+    if (length > 0) {
+      positions[i] =
+        (x / length) * length * (1 + (Math.random() - 0.5) * distortion);
+      positions[i + 1] =
+        (y / length) * length * (1 + (Math.random() - 0.5) * distortion);
+      positions[i + 2] =
+        (z / length) * length * (1 + (Math.random() - 0.5) * distortion);
+    }
+  }
+
+  positionAttr.needsUpdate = true;
+  geometry.computeVertexNormals();
+
+  // Material: rocky appearance with hazard coloring
+  const color = hazardous ? 0xff4444 : 0x4488ff; // Red for hazardous, blue for normal
+  const material = new THREE.MeshPhongMaterial({
+    color,
+    emissive: hazardous ? 0x330000 : 0x001133,
+    emissiveIntensity: 0.2,
+    roughness: 0.8,
+    metalness: 0.2,
+    flatShading: false,
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
+
+  // Scale based on asteroid size (0.1m to 1000m)
+  // Logarithmic scaling so small and large asteroids are both visible
+  const minScale = 0.05;
+  const maxScale = 0.4;
+  const logSize = Math.log10(Math.max(sizeM, 1));
+  const scale = minScale + (logSize / 3) * (maxScale - minScale);
+  mesh.scale.set(scale, scale, scale);
+
+  // Add random rotation for variety
+  mesh.rotation.x = Math.random() * Math.PI * 2;
+  mesh.rotation.y = Math.random() * Math.PI * 2;
+  mesh.rotation.z = Math.random() * Math.PI * 2;
+
+  return mesh;
+}
