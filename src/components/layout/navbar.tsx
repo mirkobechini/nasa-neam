@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { RateLimitBadge } from "@/components/rate-limit/rate-limit-badge";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
+import { TimeRangeFilter } from "@/components/dashboard/time-range-filter";
 
 export function Navbar() {
     const t = useTranslations("nav");
@@ -19,30 +20,40 @@ export function Navbar() {
 
     return (
         <nav className="sticky top-0 z-50 bg-background/85 backdrop-blur-xl border-b border-border">
-            <div className="max-w-7xl mx-auto px-4 md:px-6 flex items-center justify-between h-14">
-                <Link href="/" className="flex items-center gap-2 font-heading font-black text-lg text-primary">
-                    <span>☄️</span>
-                    <span className="hidden sm:inline">N.E.A.M.</span>
-                </Link>
+            <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 space-y-3 md:space-y-0">
+                <div className="flex items-center justify-between h-14">
+                    <Link href="/" className="flex items-center gap-2 font-heading font-black text-lg text-primary">
+                        <span>☄️</span>
+                        <span className="hidden sm:inline">N.E.A.M.</span>
+                    </Link>
 
-                <div className="flex items-center gap-1">
-                    {links.map((l) => (
-                        <Link
-                            key={l.href}
-                            href={l.href}
-                            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${pathname === l.href
-                                ? "bg-primary/20 text-primary"
-                                : "text-muted-foreground hover:text-foreground"
-                                }`}
-                        >
-                            {l.icon} {l.label}
-                        </Link>
-                    ))}
+                    <div className="flex items-center gap-1">
+                        {links.map((l) => (
+                            <Link
+                                key={l.href}
+                                href={l.href}
+                                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${pathname === l.href
+                                    ? "bg-primary/20 text-primary"
+                                    : "text-muted-foreground hover:text-foreground"
+                                    }`}
+                            >
+                                {l.icon} {l.label}
+                            </Link>
+                        ))}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <RateLimitBadge />
+                        <LanguageSwitcher />
+                    </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <RateLimitBadge />
-                    <LanguageSwitcher />
+                <div className="md:hidden flex items-center justify-center">
+                    <TimeRangeFilter />
+                </div>
+
+                <div className="hidden md:flex items-center justify-center">
+                    <TimeRangeFilter />
                 </div>
             </div>
         </nav>
