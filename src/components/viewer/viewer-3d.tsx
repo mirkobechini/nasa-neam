@@ -3,6 +3,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { createEarthTexture, createAsteroidLabel } from "@/lib/earth-texture";
 import type { AsteroidData } from "@/lib/types";
 
 interface Viewer3DProps {
@@ -45,8 +46,9 @@ export function Viewer3D({ data, onReady, onError, onHover, onClick, speed = 1 }
 
             // Earth
             const earthGeo = new THREE.SphereGeometry(1.2, 48, 48);
+            const earthTexture = createEarthTexture();
             const earthMat = new THREE.MeshPhongMaterial({
-                color: 0x4fc3f7,
+                map: earthTexture,
                 emissive: 0x1a3a5a,
                 emissiveIntensity: 0.15,
                 transparent: true,
@@ -102,7 +104,10 @@ export function Viewer3D({ data, onReady, onError, onHover, onClick, speed = 1 }
                 radius: number;
                 yOff: number;
                 speed: number;
+                name: string;
+                distKm: number;
             }[] = [];
+            const labels: THREE.Sprite[] = [];
 
             items.slice(0, count).forEach((a, i) => {
                 const angle = Math.random() * Math.PI * 2;
@@ -113,6 +118,8 @@ export function Viewer3D({ data, onReady, onError, onHover, onClick, speed = 1 }
                     radius,
                     yOff,
                     speed: 0.002 + Math.random() * 0.008,
+                    name: a.name,
+                    distKm: a.distKm,
                 });
                 positions[i * 3] = Math.cos(angle) * radius;
                 positions[i * 3 + 1] = yOff;
@@ -121,6 +128,20 @@ export function Viewer3D({ data, onReady, onError, onHover, onClick, speed = 1 }
                 colors[i * 3] = c[0];
                 colors[i * 3 + 1] = c[1];
                 colors[i * 3 + 2] = c[2];
+
+                // Create label for asteroid
+                try {
+                    const label = createAsteroidLabel(a.name, a.distKm);
+                    label.position.set(
+                        positions[i * 3],
+                        positions[i * 3 + 1] + 1,
+                        positions[i * 3 + 2]
+                    );
+                    labels.push(label);
+                    scene.add(label);
+                } catch {
+                    // Silently skip label if creation fails
+                }
             });
 
             const particleGeo = new THREE.BufferGeometry();
@@ -262,6 +283,13 @@ export function Viewer3D({ data, onReady, onError, onHover, onClick, speed = 1 }
                     pos[i * 3] = Math.cos(d.angle) * d.radius;
                     pos[i * 3 + 2] = Math.sin(d.angle) * d.radius;
                     pos[i * 3 + 1] = d.yOff + Math.sin(angle * 2 + i) * 0.2;
+
+                    // Update label position to follow asteroid
+                    if (labels[i]) {
+                        labels[i].position.x = pos[i * 3];
+                        labels[i].position.y = pos[i * 3 + 1] + 1;
+                        labels[i].position.z = pos[i * 3 + 2];
+                    }
                 });
                 particleSystem.geometry.attributes.position.needsUpdate = true;
 
