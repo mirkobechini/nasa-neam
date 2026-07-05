@@ -12,6 +12,8 @@ describe("Trajectory Viewer", () => {
     expect(content).toContain("WebGLRenderer");
     expect(content).toContain("SphereGeometry");
     expect(content).toContain("PointsMaterial");
+    expect(content).toContain("simplified");
+    expect(content).toContain("for (let i = 0; i < 2;");
   });
 
   it("should have Viewer2D component with Canvas", () => {

@@ -64,15 +64,15 @@ export function Viewer3D({ data, onReady, onError, onHover, onClick }: Viewer3DP
             const glow = new THREE.Mesh(glowGeo, glowMat);
             scene.add(glow);
 
-            // Orbit rings
-            const orbitColors = [0x4fc3f7, 0xb388ff, 0xff4081, 0x69f0ae, 0xffab40];
-            for (let i = 0; i < 5; i++) {
-                const radius = 2.8 + i * 1.1;
+            // Orbit rings (simplified: reduced from 5 to 2, low opacity)
+            const orbitColors = [0x4fc3f7, 0xb388ff];
+            for (let i = 0; i < 2; i++) {
+                const radius = 2.8 + i * 1.5;
                 const ringGeo = new THREE.RingGeometry(radius - 0.02, radius + 0.02, 64);
                 const ringMat = new THREE.MeshBasicMaterial({
                     color: orbitColors[i % orbitColors.length],
                     transparent: true,
-                    opacity: 0.1 + i * 0.02,
+                    opacity: 0.04 + i * 0.01,
                     side: THREE.DoubleSide,
                 });
                 const ring = new THREE.Mesh(ringGeo, ringMat);
