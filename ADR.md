@@ -88,8 +88,9 @@ Progetto personale (poi pubblico) per visualizzare asteroidi vicini alla Terra, 
 - [x] 3D viewer: orbite ad anello troppo complesse (PR #45)
 - [x] 3D viewer: aggiungere controllo velocità (slow/normal/fast) (PR #47)
 - [x] API: gestione parametri data e caching da rivedere (PR #40)
-- [x] 3D viewer: Earth texture sembra Nettuno, labels asteroidi troppo grandi (PR #49)
+- [x] 3D viewer: Earth texture sembra Nettuno, labels asteroidi troppo grandi (PR #52)
 - [x] Time range filter: custom date picker non funziona (PR #50)
 - [x] Dashboard: filtro temporale in home, non in navbar (PR #51)
 - [ ] Navbar: posizionamento barra periodo da risistemare (layout poco pulito)
+- [ ] Time range persistence: periodo persiste tra pagine, ma dati non corrispondono
 - [ ] Dashboard: posizionamento barra periodo da risistemare (navbar layout tweaks)

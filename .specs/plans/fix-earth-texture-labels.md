@@ -18,4 +18,12 @@
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata — PR #52 (2026-07-05)
+
+- Texture Terra completamente rivista: oceani blu realistici, continenti con colori vari (verdi, marroni, arancioni)
+- Aggiunti più continenti (Groenlandia, Nuova Zelanda, Antartide)
+- Aggiunto effetto nuvole e atmosfera
+- Asteroid labels ridotti da 256x128 a 120x60
+- Font ridotti: nome 24px → 10px, distanza 14px → 8px
+- Sprite scale ridotta da (2,1,1) a (0.8,0.4,1)
+- 72 test totali, tutti passanti
