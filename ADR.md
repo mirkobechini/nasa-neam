@@ -51,6 +51,24 @@ Progetto personale (poi pubblico) per visualizzare asteroidi vicini alla Terra, 
 | **Risorse NASA esterne**          | Contenuti scritti da noi       | Zero effort di mantenimento, dati sempre aggiornati                      |
 | **proxy.ts (Next.js 16)**         | middleware.ts (deprecato)      | Next.js 16 ha deprecato `middleware.ts` in favore di `proxy.ts`          |
 | **Logica API condivisa (neo.ts)** | Codice duplicato in ogni route | `src/lib/neo.ts` centralizza parsing asteroidi, upsert e filtraggio data |
+| **2D Viewer: anime sprites**      | Photo-realistic textures       | Coerente con tema anime dark-space, asset generati proceduralmente       |
+| **2D Asteroid sizing**            | Proporzionale lineare          | Logaritmico (40-120px canvas) per visibilità migliore su asterischi      |
+
+## Specifiche tecniche — 2D Viewer (PR #55)
+
+**Implementazione**: `src/lib/earth-texture.ts`
+
+- `createEarth2DAnime(size=400)`: Canvas 2D con gradiente radiale blues (#1e88e5/#1565c0/#0d47a1), 5 ellipsi continenti colorati (NA, SA, EU, Asia, Australia)
+- `createAsteroid2DSprite2D(name, sizeM, isHazardous)`: Sprite 12-point jagged outline, log scale 40-120px canvas based on sizeM, blue (#4fc3f7) safe / red (#ef4444) hazardous border contour
+
+**Integrazione**: `src/components/viewer/viewer-2d.tsx`
+
+- Import `createEarth2DAnime` e `createAsteroid2DSprite2D`
+- Ref cache: `earthCanvasRef`, `asteroidCanvasesRef` (Map<id, canvas>)
+- Rendering: `ctx.drawImage()` al posto di cerchi per Terra e asteroidi
+- Hit detection: mantenuta su `positionsRef` con sprite size (dynamic based on canvas)
+
+**Tema**: anime dark-space coerente con 3D viewer, proporzioni percettive migliorate
 
 ## Vincoli
 
@@ -74,7 +92,7 @@ Progetto personale (poi pubblico) per visualizzare asteroidi vicini alla Terra, 
 ## Feature future pianificate
 
 - [x] Render asteroids as 3D mesh objects (rocce dettagliate, non puntini) (PR #54)
-- [ ] 2D viewer visual improvements (Earth anime-style image + asteroid anime images with hazard borders, proporzionato per sizeM)
+- [x] 2D viewer visual improvements (anime-style Earth + anime asteroid sprites with hazard borders, proportional sizing sizeM→canvas) (PR #55)
 - [ ] Confronto asteroidi side-by-side
 - [ ] Export CSV dati asteroidi
 - [ ] PWA (installabile come app) — da ultimo
