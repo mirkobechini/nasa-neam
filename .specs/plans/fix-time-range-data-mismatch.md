@@ -26,4 +26,11 @@ Risolvere bug dove il periodo selezionato persiste tra le pagine (grazie a TimeR
 
 ## Status
 
-[ ] Non iniziata - da investigare e fixare
+[x] Completata — PR #53 (2026-07-05)
+
+- Importato useTimeRange nel viewer page
+- Aggiunto dateMin, dateMax al fetchData
+- API call ora inclusa parametri start_date e end_date
+- Dependency array corretto: [dateMin, dateMax]
+- Viewer ora ricarica dati quando il periodo cambia nella navbar
+- 72 test totali, tutti passanti
