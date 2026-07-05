@@ -87,4 +87,24 @@ describe("Trajectory Viewer", () => {
     expect(content).toContain('mode === "3d" &&');
     expect(content).toContain("speed={speed}");
   });
+
+  it("should have Earth texture and label generator", () => {
+    const content = fs.readFileSync("src/lib/earth-texture.ts", "utf-8");
+    expect(content).toContain("createEarthTexture");
+    expect(content).toContain("createAsteroidLabel");
+    expect(content).toContain("THREE.CanvasTexture");
+    expect(content).toContain("THREE.Sprite");
+  });
+
+  it("should integrate Earth texture in Viewer3D", () => {
+    const content = fs.readFileSync(
+      "src/components/viewer/viewer-3d.tsx",
+      "utf-8",
+    );
+    expect(content).toContain("createEarthTexture");
+    expect(content).toContain("createAsteroidLabel");
+    expect(content).toContain("earthTexture");
+    expect(content).toContain("labels");
+    expect(content).toContain("labels[i].position");
+  });
 });
