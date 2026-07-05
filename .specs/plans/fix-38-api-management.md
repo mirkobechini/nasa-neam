@@ -13,4 +13,7 @@ Controllare e migliorare la gestione delle chiamate API NASA, inclusi parametri 
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata
+
+- **Completata il:** 2026-07-05
+- **Note:** Creata libreria condivisa `src/lib/neo.ts` con `parseAsteroidData`, `upsertAsteroid`, `buildDateFilter`, `fetchFromNasaAndCache`. Entrambe le route (`/api/neo/feed` e `/api/neo/stats`) ora usano la logica condivisa e filtrano per `closeApproach` invece che `fetchedAt`. Rimosse ~200 righe di codice duplicato.

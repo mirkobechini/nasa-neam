@@ -40,16 +40,17 @@ Progetto personale (poi pubblico) per visualizzare asteroidi vicini alla Terra, 
 
 ## Decisioni architetturali
 
-| Scelta                            | Alternativa                   | Motivo                                                                  |
-| --------------------------------- | ----------------------------- | ----------------------------------------------------------------------- |
-| **Next.js unificato**             | FastAPI + Next.js separati    | Deploy singolo su Vercel, minore complessità operativa                  |
-| **SQLite**                        | PostgreSQL                    | Zero setup, nessun servizio esterno, sufficiente per cache + preferenze |
-| **next-intl**                     | react-i18next, custom         | Standard Next.js 14+, SEO nativo, URL per lingua                        |
-| **Three.js**                      | Babylon.js                    | Standard de facto, già usato nel prototipo                              |
-| **Toggle suoni** (non rimuoverli) | Rimozione completa dei suoni  | L'utente vuole poterli riattivare, non eliminarli                       |
-| **Proxy backend (API Routes)**    | Chiamata diretta dal frontend | Protegge API key NASA, gestisce caching server-side                     |
-| **Risorse NASA esterne**          | Contenuti scritti da noi      | Zero effort di mantenimento, dati sempre aggiornati                     |
-| **proxy.ts (Next.js 16)**         | middleware.ts (deprecato)     | Next.js 16 ha deprecato `middleware.ts` in favore di `proxy.ts`         |
+| Scelta                            | Alternativa                    | Motivo                                                                   |
+| --------------------------------- | ------------------------------ | ------------------------------------------------------------------------ |
+| **Next.js unificato**             | FastAPI + Next.js separati     | Deploy singolo su Vercel, minore complessità operativa                   |
+| **SQLite**                        | PostgreSQL                     | Zero setup, nessun servizio esterno, sufficiente per cache + preferenze  |
+| **next-intl**                     | react-i18next, custom          | Standard Next.js 14+, SEO nativo, URL per lingua                         |
+| **Three.js**                      | Babylon.js                     | Standard de facto, già usato nel prototipo                               |
+| **Toggle suoni** (non rimuoverli) | Rimozione completa dei suoni   | L'utente vuole poterli riattivare, non eliminarli                        |
+| **Proxy backend (API Routes)**    | Chiamata diretta dal frontend  | Protegge API key NASA, gestisce caching server-side                      |
+| **Risorse NASA esterne**          | Contenuti scritti da noi       | Zero effort di mantenimento, dati sempre aggiornati                      |
+| **proxy.ts (Next.js 16)**         | middleware.ts (deprecato)      | Next.js 16 ha deprecato `middleware.ts` in favore di `proxy.ts`          |
+| **Logica API condivisa (neo.ts)** | Codice duplicato in ogni route | `src/lib/neo.ts` centralizza parsing asteroidi, upsert e filtraggio data |
 
 ## Vincoli
 
@@ -83,4 +84,4 @@ Progetto personale (poi pubblico) per visualizzare asteroidi vicini alla Terra, 
 - [ ] 3D viewer: click-drag conflict (click dopo drag apre modal)
 - [ ] 3D viewer: orbite ad anello troppo complesse
 - [ ] 3D viewer: aggiungere controllo velocità (slow/normal/fast)
-- [ ] API: gestione parametri data e caching da rivedere
+- [x] API: gestione parametri data e caching da rivedere (PR #40)
