@@ -31,4 +31,13 @@ Renderizzare gli asteroidi come mesh 3D visibili (rocce dettagliate) invece di p
 
 ## Status
 
-[ ] Non iniziata
+[x] Completata — PR #54 (2026-07-05)
+
+- Implementato createAsteroidMesh con IcosahedronGeometry
+- Distorsione casuale per effetto roccia
+- Colorazione hazardous (rosso) vs normal (blu)
+- Scaling logaritmico per visibilità
+- Integrato nel viewer-3d: sostituiti Points con Mesh 3D
+- Raycaster aggiornato per colpire i mesh individuali
+- Animazione mesh con rotazione
+- 73 test totali (+1 nuovo), tutti passanti
