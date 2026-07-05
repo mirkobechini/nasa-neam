@@ -50,4 +50,41 @@ describe("Trajectory Viewer", () => {
     expect(it.visualization.switch3d).toBe("3D");
     expect(en.visualization.switch3d).toBe("3D");
   });
+
+  it("should have SpeedControls component", () => {
+    const content = fs.readFileSync(
+      "src/components/viewer/speed-controls.tsx",
+      "utf-8",
+    );
+    expect(content).toContain("SpeedControls");
+    expect(content).toContain("speed");
+    expect(content).toContain("onSpeedChange");
+    expect(content).toContain("Slow");
+    expect(content).toContain("Normal");
+    expect(content).toContain("Fast");
+  });
+
+  it("should have Viewer3D component with speed prop", () => {
+    const content = fs.readFileSync(
+      "src/components/viewer/viewer-3d.tsx",
+      "utf-8",
+    );
+    expect(content).toContain("speed");
+    expect(content).toContain("speed = 1");
+    expect(content).toContain("angle += 0.002 * speed");
+    expect(content).toContain("earth.rotation.y += 0.005 * speed");
+    expect(content).toContain("d.angle += d.speed * speed");
+    expect(content).toContain("controls.autoRotateSpeed = 1.0 * speed");
+  });
+
+  it("should integrate SpeedControls in viewer page", () => {
+    const content = fs.readFileSync(
+      "src/app/[locale]/viewer/page.tsx",
+      "utf-8",
+    );
+    expect(content).toContain("SpeedControls");
+    expect(content).toContain("const [speed, setSpeed]");
+    expect(content).toContain('mode === "3d" &&');
+    expect(content).toContain("speed={speed}");
+  });
 });
