@@ -5,7 +5,6 @@ import { useTranslations } from "next-intl";
 import { HeroStats } from "@/components/dashboard/hero-stats";
 import { BubbleChart } from "@/components/dashboard/bubble-chart";
 import { HazardBarChart } from "@/components/dashboard/hazard-bar-chart";
-import { TimeRangeFilter } from "@/components/dashboard/time-range-filter";
 import { useTimeRange } from "@/lib/contexts/TimeRangeContext";
 import type { StatsData } from "@/lib/types";
 
@@ -81,7 +80,6 @@ export default function DashboardPage() {
               {t("subtitle")}
             </p>
           </div>
-          <TimeRangeFilter />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

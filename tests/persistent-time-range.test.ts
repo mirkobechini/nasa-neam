@@ -24,13 +24,13 @@ describe("Persistent Time Range Feature", () => {
     expect(content).toContain("setPredefinedRange");
   });
 
-  it("should have TimeRangeFilter in NavbarWrapper", () => {
+  it("should have TimeRangeFilter in Navbar", () => {
     const content = fs.readFileSync(
-      "src/components/layout/navbar-wrapper.tsx",
+      "src/components/layout/navbar.tsx",
       "utf-8",
     );
     expect(content).toContain("TimeRangeFilter");
-    expect(content).toContain("NavbarWrapper");
+    expect(content).toContain("Navbar");
   });
 
   it("dashboard page should use TimeRangeContext", () => {

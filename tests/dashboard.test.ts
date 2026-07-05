@@ -48,7 +48,6 @@ describe("Dashboard components", () => {
     expect(page).toContain("HeroStats");
     expect(page).toContain("BubbleChart");
     expect(page).toContain("HazardBarChart");
-    expect(page).toContain("TimeRangeFilter");
     expect(page).toContain("fetchData");
     expect(page).toContain("/api/neo/stats");
   });
